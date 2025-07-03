@@ -53,102 +53,14 @@ function generateSimpleLogo(letter, color) {
   return canvas.toDataURL();
 }
 
-// Replace this section in your popup.js file where brand filters are created
-
-// Function to extract brand logos from saved items
-function getBrandLogosFromItems(savedItems) {
-  const brandLogos = {};
+function getBrandIcon(store) {
+  if (!store) return 'https://via.placeholder.com/32?text=?';
   
-  savedItems.forEach(item => {
-    if (item.brand && item.brandLogo) {
-      brandLogos[item.brand.toLowerCase()] = item.brandLogo;
-    } else if (item.brand && item.url) {
-      // Extract favicon/logo from the website URL as fallback
-      const domain = new URL(item.url).hostname;
-      brandLogos[item.brand.toLowerCase()] = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-    }
-  });
+  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3', '#54A0FF'];
+  const color = colors[store.charCodeAt(0) % colors.length];
+  const letter = store.charAt(0).toUpperCase();
   
-  return brandLogos;
-}
-
-// Alternative: Extract logo from product image or website
-function extractBrandLogo(item) {
-  // Option 1: If brand logo is stored separately in your data
-  if (item.brandLogo) {
-    return item.brandLogo;
-  }
-  
-  // Option 2: Use high-quality favicon
-  if (item.url) {
-    const domain = new URL(item.url).hostname;
-    return `https://logo.clearbit.com/${domain}`; // Higher quality than Google favicons
-  }
-  
-  // Option 3: Try to extract from meta tags or known patterns
-  // This would need to be done when saving the item initially
-  return null;
-}
-
-// Function to create brand filter buttons from saved items
-function createBrandFilters(savedItems) {
-  const brandFilters = document.getElementById('brand-filters');
-  brandFilters.innerHTML = '';
-  
-  // Get unique brands from saved items
-  const uniqueBrands = [...new Set(savedItems.map(item => item.brand).filter(Boolean))];
-  
-  if (uniqueBrands.length === 0) return;
-  
-  // Get brand logos from saved items
-  const brandLogos = getBrandLogosFromItems(savedItems);
-  
-  uniqueBrands.forEach(brand => {
-    const brandButton = document.createElement('img');
-    brandButton.className = 'brand-icon';
-    brandButton.src = brandLogos[brand.toLowerCase()] || extractBrandLogo(savedItems.find(item => item.brand === brand));
-    brandButton.alt = brand;
-    brandButton.title = brand;
-    brandButton.dataset.brand = brand;
-    
-    // Handle image load errors
-    brandButton.onerror = function() {
-      // Fallback to a generic brand icon or text
-      const fallback = document.createElement('div');
-      fallback.className = 'brand-icon brand-text';
-      fallback.textContent = brand.charAt(0).toUpperCase();
-      fallback.title = brand;
-      fallback.dataset.brand = brand;
-      fallback.style.cssText = `
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 14px;
-        color: #333;
-        background: #f0f0f0;
-      `;
-      this.parentNode.replaceChild(fallback, this);
-    };
-    
-    brandButton.addEventListener('click', () => {
-      brandButton.classList.toggle('active');
-      filterProducts();
-    });
-    
-    brandFilters.appendChild(brandButton);
-  });
-}
-
-// Call this function when loading your saved items
-function loadSavedItems() {
-  // Your existing code to load saved items
-  const savedItems = getSavedItems(); // Your existing function
-  
-  // Create brand filters from the actual saved items
-  createBrandFilters(savedItems);
-  
-  // Rest of your existing code...
+  return generateSimpleLogo(letter, color);
 }
 
 function toggleSaveButton() {
