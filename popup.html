@@ -4,53 +4,70 @@
   <title>The Dressing Room</title>
   <style>
     body {
-      width: 360px;
-      padding: 10px;
-      font-family: Arial, sans-serif;
+      width: 380px;
+      max-height: 600px;
+      padding: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #fff;
       color: #333;
+      margin: 0;
+      overflow-x: hidden;
     }
 
     h2 {
       font-size: 18px;
-      margin-bottom: 6px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 6px;
+      margin: 0 0 8px 0;
+      border-bottom: 2px solid #0077cc;
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     #brand-filters {
       display: flex;
-      gap: 12px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 12px;
       align-items: center;
       flex-wrap: wrap;
+      padding: 8px 0;
     }
 
     .brand-icon {
       width: 32px;
       height: 32px;
       cursor: pointer;
-      opacity: 0.6;
-      border-radius: 4px;
-      border: 1px solid transparent;
-      transition: transform 0.1s ease, opacity 0.2s ease;
+      opacity: 0.7;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      object-fit: cover;
+      background: #f8f9fa;
     }
 
     .brand-icon:hover {
       opacity: 1;
-      transform: scale(1.1);
+      transform: scale(1.05);
+      border-color: #0077cc;
     }
 
     .brand-icon.active {
       border-color: #0077cc;
       opacity: 1;
+      box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
     }
 
     #total-count,
     #total-price {
       font-size: 14px;
-      margin-bottom: 5px;
+      margin: 4px 0;
       color: #555;
+      font-weight: 500;
+    }
+
+    #total-price {
+      color: #0077cc;
+      font-weight: bold;
     }
 
     .product {
@@ -58,17 +75,26 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
-      gap: 10px;
+      gap: 12px;
       border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
+      padding-bottom: 12px;
+      transition: background 0.2s ease;
+    }
+
+    .product:hover {
+      background: #f8f9fa;
+      border-radius: 6px;
+      padding: 8px;
+      margin: 0 -8px 12px -8px;
     }
 
     .product img {
       width: 60px;
       height: 60px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
       flex-shrink: 0;
+      border: 1px solid #eee;
     }
 
     .info {
@@ -79,33 +105,46 @@
     .info p {
       margin: 2px 0;
       font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      line-height: 1.4;
+    }
+
+    .info p:first-child {
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .info a {
-      color: #0077cc;
+      color: #333;
       text-decoration: none;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
     }
 
     .info a:hover {
+      color: #0077cc;
       text-decoration: underline;
     }
 
     .delete-btn {
       background: transparent;
       border: none;
-      color: #cc0000;
-      font-size: 18px;
+      color: #dc3545;
+      font-size: 16px;
       cursor: pointer;
-      padding: 0;
-      margin-left: 6px;
-      transition: color 0.2s ease;
+      padding: 4px;
+      margin-left: 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      opacity: 0.7;
     }
 
     .delete-btn:hover {
-      color: #ff3333;
+      background: rgba(220, 53, 69, 0.1);
+      opacity: 1;
+      transform: scale(1.1);
     }
 
     #pagination {
@@ -113,47 +152,311 @@
       justify-content: center;
       align-items: center;
       gap: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
+      padding: 8px 0;
+      border-top: 1px solid #eee;
     }
 
     #pagination button {
-      padding: 6px 10px;
+      padding: 8px 12px;
       font-size: 14px;
       cursor: pointer;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background: #f5f5f5;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background: #fff;
       color: #333;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
+      min-width: 40px;
     }
 
     #pagination button:disabled {
       opacity: 0.4;
       cursor: not-allowed;
+      background: #f8f9fa;
     }
 
     #pagination button:hover:not(:disabled) {
-      background-color: #ddd;
+      background: #0077cc;
+      color: white;
+      border-color: #0077cc;
     }
 
     #page-number {
       font-size: 14px;
       color: #555;
+      font-weight: 500;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .empty-state p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    .stats-container {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .clear-all-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s ease;
+    }
+
+    .clear-all-btn:hover {
+      background: #c82333;
     }
   </style>
 </head>
 <body>
-  <h2>👗 Saved Items</h2>
+  <h2>
+    <span>👗 Saved Items</span>
+    <button id="clear-all-btn" class="clear-all-btn" style="display: none;">Clear All</button>
+  </h2>
+  
   <div id="brand-filters"></div>
-  <div id="total-count"></div>
-  <div id="total-price"></div>
-  <div id="product-list">Loading...</div>
+  
+  <div class="stats-container">
+    <div id="total-count">Items: 0</div>
+    <div id="total-price">Total: $0.00</div>
+  </div>
+  
+  <div id="product-list">
+    <div class="empty-state">
+      <p>🛍️ No items saved yet!</p>
+      <p>Visit any shopping website and click the "Save to Dressing Room" button to get started.</p>
+    </div>
+  </div>
+  
   <div id="pagination">
     <button id="prev-btn" disabled>←</button>
-    <span id="page-number">Page 1</span>
+    <span id="page-number">No items</span>
     <button id="next-btn" disabled>→</button>
   </div>
 
-  <script src="popup.js"></script>
-</body>
-</html>
+  <script>
+    const ITEMS_PER_PAGE = 5;
+    let currentPage = 1;
+    let allProducts = [];
+    let filteredStore = null;
+
+    function parsePrice(priceStr) {
+      if (!priceStr || priceStr === 'Price not found') return 0;
+      
+      const cleaned = priceStr.replace(/[,$£€¥₹]/g, '').replace(/\s+/g, ' ').trim();
+      const patterns = [
+        /(\d+\.?\d*)/,
+        /(\d+,\d+\.?\d*)/,
+        /(\d+\.\d{2})/,
+        /(\d+)/
+      ];
+      
+      for (const pattern of patterns) {
+        const match = cleaned.match(pattern);
+        if (match) {
+          const num = parseFloat(match[1].replace(/,/g, ''));
+          if (!isNaN(num) && num > 0) {
+            return num;
+          }
+        }
+      }
+      
+      return 0;
+    }
+
+    function generateSimpleLogo(letter, color) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(16, 16, 16, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 18px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(letter, 16, 16);
+      
+      return canvas.toDataURL();
+    }
+
+    function getBrandIcon(store) {
+      if (!store) return 'https://via.placeholder.com/32?text=?';
+      
+      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3', '#54A0FF'];
+      const color = colors[store.charCodeAt(0) % colors.length];
+      const letter = store.charAt(0).toUpperCase();
+      
+      return generateSimpleLogo(letter, color);
+    }
+
+    function renderProducts() {
+      const list = document.getElementById('product-list');
+      const totalCountDiv = document.getElementById('total-count');
+      const totalPriceDiv = document.getElementById('total-price');
+      const pageNumberSpan = document.getElementById('page-number');
+      const clearAllBtn = document.getElementById('clear-all-btn');
+
+      const products = filteredStore
+        ? allProducts.filter(p => p.store?.toLowerCase() === filteredStore.toLowerCase())
+        : allProducts;
+
+      const totalItems = products.length;
+      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+      const totalPrice = products.reduce((sum, item) => sum + parsePrice(item.price), 0);
+
+      totalCountDiv.textContent = `Items: ${totalItems}`;
+      totalPriceDiv.textContent = `Total: ${totalPrice.toFixed(2)}`;
+      pageNumberSpan.textContent = totalPages ? `Page ${currentPage} of ${totalPages}` : 'No items';
+
+      clearAllBtn.style.display = totalItems > 0 ? 'block' : 'none';
+
+      if (totalItems === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <p>🛍️ No items saved yet!</p>
+            <p>Visit any shopping website and click the "Save to Dressing Room" button to get started.</p>
+          </div>
+        `;
+        document.getElementById('prev-btn').disabled = true;
+        document.getElementById('next-btn').disabled = true;
+        return;
+      }
+
+      const start = (currentPage - 1) * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      const pageItems = products.slice(start, end);
+
+      list.innerHTML = '';
+
+      pageItems.forEach((item, index) => {
+        const productDiv = document.createElement('div');
+        productDiv.className = 'product';
+
+        const displayPrice = item.price === 'Price not found' ? 'Price not available' : item.price;
+        const imageUrl = item.image || 'https://via.placeholder.com/60?text=No+Image';
+
+        productDiv.innerHTML = `
+          <img src="${imageUrl}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/60?text=No+Image'" />
+          <div class="info">
+            <p><a href="${item.url}" target="_blank" rel="noopener noreferrer" title="${item.name}"><strong>${item.name}</strong></a></p>
+            <p style="color: #0077cc; font-weight: bold;">${displayPrice}</p>
+            <p style="font-size:11px; color:gray;">${item.store} • ${new Date(item.savedAt).toLocaleDateString()}</p>
+          </div>
+          <button data-index="${allProducts.indexOf(item)}" class="delete-btn" aria-label="Delete ${item.name}" title="Delete item">🗑️</button>
+        `;
+
+        list.appendChild(productDiv);
+      });
+
+      document.getElementById('prev-btn').disabled = currentPage === 1;
+      document.getElementById('next-btn').disabled = currentPage >= totalPages;
+
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-index'));
+          if (confirm('Are you sure you want to delete this item?')) {
+            allProducts.splice(idx, 1);
+            chrome.storage.local.set({ products: allProducts }, () => {
+              const newTotalPages = Math.ceil(allProducts.length / ITEMS_PER_PAGE);
+              if (currentPage > newTotalPages && newTotalPages > 0) {
+                currentPage = newTotalPages;
+              }
+              renderBrandFilters();
+              renderProducts();
+            });
+          }
+        });
+      });
+    }
+
+    function renderBrandFilters() {
+      const filterDiv = document.getElementById('brand-filters');
+      filterDiv.innerHTML = '';
+
+      const uniqueStores = [...new Set(allProducts.map(p => p.store?.trim()).filter(Boolean))];
+      
+      if (uniqueStores.length === 0) {
+        return;
+      }
+
+      uniqueStores.forEach(store => {
+        const img = document.createElement('img');
+        img.className = 'brand-icon';
+        img.src = getBrandIcon(store);
+        img.alt = store;
+        img.title = store;
+        
+        if (store === filteredStore) {
+          img.classList.add('active');
+        }
+
+        img.addEventListener('click', () => {
+          filteredStore = filteredStore === store ? null : store;
+          currentPage = 1;
+          renderBrandFilters();
+          renderProducts();
+        });
+
+        filterDiv.appendChild(img);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      chrome.storage.local.get(['products'], (result) => {
+        allProducts = Array.isArray(result.products) ? result.products : [];
+        renderBrandFilters();
+        renderProducts();
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderProducts();
+          }
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+          const products = filteredStore
+            ? allProducts.filter(p => p.store?.toLowerCase() === filteredStore.toLowerCase())
+            : allProducts;
+          const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderProducts();
+          }
+        });
+
+        document.getElementById('clear-all-btn').addEventListener('click', () => {
+          if (confirm('Are you sure you want to delete all saved items?')) {
+            allProducts = [];
+            chrome.storage.local.set({ products: [] }, () => {
+              currentPage = 1;
+              filteredStore = null;
+              renderBrandFilters();
+              renderProducts();
+            });
+          }
+        });
+      });
+    });
+  </script>
