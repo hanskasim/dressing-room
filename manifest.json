@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "The Dressing Room",
+    "version": "1.0",
+    "description": "Save fashion items from any store",
+    "permissions": ["storage", "activeTab", "scripting"],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  
