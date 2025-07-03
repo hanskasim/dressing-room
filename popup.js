@@ -2,6 +2,7 @@ const ITEMS_PER_PAGE = 5;
 let currentPage = 1;
 let allProducts = [];
 let filteredStore = null;
+let saveButtonVisible = false;
 
 function parsePrice(priceStr) {
   if (!priceStr || priceStr === 'Price not found') return 0;
@@ -30,46 +31,6 @@ function parsePrice(priceStr) {
   return 0;
 }
 
-function getBrandIcon(store) {
-  if (!store) return 'https://via.placeholder.com/32?text=?';
-  
-  const storeLower = store.toLowerCase();
-  
-  // Use a more reliable approach with different icon sources
-  const brandIcons = {
-    'uniqlo': 'https://logos-world.net/wp-content/uploads/2020/11/Uniqlo-Logo-700x394.png',
-    'h&m': 'https://logos-world.net/wp-content/uploads/2020/04/HM-Logo-700x394.png',
-    'everlane': 'https://logos-world.net/wp-content/uploads/2021/02/Everlane-Logo-700x394.png',
-    'zara': 'https://logos-world.net/wp-content/uploads/2020/04/Zara-Logo-700x394.png',
-    'nike': 'https://logos-world.net/wp-content/uploads/2020/04/Nike-Logo-700x394.png',
-    'adidas': 'https://logos-world.net/wp-content/uploads/2020/04/Adidas-Logo-700x394.png',
-    'gap': 'https://logos-world.net/wp-content/uploads/2020/09/Gap-Logo-700x394.png',
-    'target': 'https://logos-world.net/wp-content/uploads/2020/04/Target-Logo-700x394.png',
-    'walmart': 'https://logos-world.net/wp-content/uploads/2020/04/Walmart-Logo-700x394.png',
-    'amazon': 'https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo-700x394.png'
-  };
-  
-  // Try to find exact match first
-  if (brandIcons[storeLower]) {
-    return brandIcons[storeLower];
-  }
-  
-  // Try partial matches
-  for (const [brand, icon] of Object.entries(brandIcons)) {
-    if (storeLower.includes(brand) || brand.includes(storeLower)) {
-      return icon;
-    }
-  }
-  
-  // Generate a simple colored favicon as fallback
-  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3', '#54A0FF'];
-  const color = colors[store.charCodeAt(0) % colors.length];
-  const letter = store.charAt(0).toUpperCase();
-  
-  // Use canvas to create a simple logo
-  return generateSimpleLogo(letter, color);
-}
-
 function generateSimpleLogo(letter, color) {
   const canvas = document.createElement('canvas');
   canvas.width = 32;
@@ -92,11 +53,39 @@ function generateSimpleLogo(letter, color) {
   return canvas.toDataURL();
 }
 
+function getBrandIcon(store) {
+  if (!store) return 'https://via.placeholder.com/32?text=?';
+  
+  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3', '#54A0FF'];
+  const color = colors[store.charCodeAt(0) % colors.length];
+  const letter = store.charAt(0).toUpperCase();
+  
+  return generateSimpleLogo(letter, color);
+}
+
+function toggleSaveButton() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleSaveButton' }, (response) => {
+      const button = document.getElementById('save-toggle-btn');
+      saveButtonVisible = !saveButtonVisible;
+      
+      if (saveButtonVisible) {
+        button.textContent = 'Hide Save Button';
+        button.classList.add('active');
+      } else {
+        button.textContent = 'Show Save Button';
+        button.classList.remove('active');
+      }
+    });
+  });
+}
+
 function renderProducts() {
   const list = document.getElementById('product-list');
   const totalCountDiv = document.getElementById('total-count');
   const totalPriceDiv = document.getElementById('total-price');
   const pageNumberSpan = document.getElementById('page-number');
+  const clearAllBtn = document.getElementById('clear-all-btn');
 
   const products = filteredStore
     ? allProducts.filter(p => p.store?.toLowerCase() === filteredStore.toLowerCase())
@@ -110,8 +99,15 @@ function renderProducts() {
   totalPriceDiv.textContent = `Total: $${totalPrice.toFixed(2)}`;
   pageNumberSpan.textContent = totalPages ? `Page ${currentPage} of ${totalPages}` : 'No items';
 
+  clearAllBtn.style.display = totalItems > 0 ? 'block' : 'none';
+
   if (totalItems === 0) {
-    list.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No items saved yet.<br>Visit a shopping site and click the save button!</p>';
+    list.innerHTML = `
+      <div class="empty-state">
+        <p>🛍️ No items saved yet!</p>
+        <p>Click "Show Save Button" above, then visit any shopping website and click the "Save to Dressing Room" button to get started.</p>
+      </div>
+    `;
     document.getElementById('prev-btn').disabled = true;
     document.getElementById('next-btn').disabled = true;
     return;
@@ -143,18 +139,15 @@ function renderProducts() {
     list.appendChild(productDiv);
   });
 
-  // Update pagination buttons
   document.getElementById('prev-btn').disabled = currentPage === 1;
   document.getElementById('next-btn').disabled = currentPage >= totalPages;
 
-  // Add delete button event listeners
   document.querySelectorAll('.delete-btn').forEach(button => {
     button.addEventListener('click', (e) => {
       const idx = parseInt(e.target.getAttribute('data-index'));
       if (confirm('Are you sure you want to delete this item?')) {
         allProducts.splice(idx, 1);
         chrome.storage.local.set({ products: allProducts }, () => {
-          // Adjust current page if needed
           const newTotalPages = Math.ceil(allProducts.length / ITEMS_PER_PAGE);
           if (currentPage > newTotalPages && newTotalPages > 0) {
             currentPage = newTotalPages;
@@ -178,9 +171,6 @@ function renderBrandFilters() {
   }
 
   uniqueStores.forEach(store => {
-    const container = document.createElement('div');
-    container.style.cssText = 'position: relative; display: inline-block;';
-    
     const img = document.createElement('img');
     img.className = 'brand-icon';
     img.src = getBrandIcon(store);
@@ -191,11 +181,6 @@ function renderBrandFilters() {
       img.classList.add('active');
     }
 
-    // Add error handling for brand icons
-    img.onerror = () => {
-      img.src = generateSimpleLogo(store.charAt(0).toUpperCase(), '#666');
-    };
-
     img.addEventListener('click', () => {
       filteredStore = filteredStore === store ? null : store;
       currentPage = 1;
@@ -203,8 +188,7 @@ function renderBrandFilters() {
       renderProducts();
     });
 
-    container.appendChild(img);
-    filterDiv.appendChild(container);
+    filterDiv.appendChild(img);
   });
 }
 
@@ -214,6 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
     allProducts = Array.isArray(result.products) ? result.products : [];
     renderBrandFilters();
     renderProducts();
+
+    // Save button toggle
+    document.getElementById('save-toggle-btn').addEventListener('click', toggleSaveButton);
 
     // Pagination event listeners
     document.getElementById('prev-btn').addEventListener('click', () => {
@@ -234,20 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Add clear all button functionality
-    const clearAllBtn = document.createElement('button');
-    clearAllBtn.textContent = 'Clear All';
-    clearAllBtn.style.cssText = `
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      margin-left: 10px;
-    `;
-    clearAllBtn.addEventListener('click', () => {
+    // Clear all button
+    document.getElementById('clear-all-btn').addEventListener('click', () => {
       if (confirm('Are you sure you want to delete all saved items?')) {
         allProducts = [];
         chrome.storage.local.set({ products: [] }, () => {
@@ -258,7 +233,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     });
-
-    document.querySelector('h2').appendChild(clearAllBtn);
   });
 });

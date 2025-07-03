@@ -34,6 +34,7 @@ function waitForElement(selector, timeout = 5000) {
   });
 }
 
+// Only add save button when requested
 async function addSaveButton() {
   try {
     // Wait for page content to load
@@ -79,6 +80,14 @@ async function addSaveButton() {
 
   button.onclick = saveProduct;
   document.body.appendChild(button);
+}
+
+// Function to remove save button
+function removeSaveButton() {
+  const button = document.getElementById('dressing-room-save-btn');
+  if (button) {
+    button.remove();
+  }
 }
 
 function findPrice() {
@@ -252,10 +261,12 @@ async function saveProduct() {
       savedAt: new Date().toISOString()
     };
 
+    // Use chrome.storage.local.get with callback
     chrome.storage.local.get(['products'], function (result) {
       const products = result.products || [];
       products.push(product);
       chrome.storage.local.set({ products: products }, () => {
+        console.log('Product saved:', product);
         if (button) {
           button.textContent = '✅ Saved!';
           setTimeout(() => {
@@ -278,18 +289,15 @@ async function saveProduct() {
   }
 }
 
-// Run when page loads
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addSaveButton);
-} else {
-  addSaveButton();
-}
-
-// Also run when URL changes (for SPAs)
-let currentUrl = window.location.href;
-setInterval(() => {
-  if (currentUrl !== window.location.href) {
-    currentUrl = window.location.href;
-    setTimeout(addSaveButton, 1000); // Delay to let page load
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'toggleSaveButton') {
+    const button = document.getElementById('dressing-room-save-btn');
+    if (button) {
+      removeSaveButton();
+    } else {
+      addSaveButton();
+    }
+    sendResponse({ success: true });
   }
-}, 1000);
+});
