@@ -1497,55 +1497,12 @@ function openCompareWindow() {
   });
 }
 
-async function handleSyncClick() {
-  const status = await chrome.runtime.sendMessage({ action: 'checkSyncStatus' });
-
-  if (!status.isAuthenticated) {
-    chrome.runtime.sendMessage({ action: 'signIn' });
-  } else if (!status.syncEnabled) {
-    chrome.runtime.sendMessage({ action: 'syncAll' });
-  } else {
-    chrome.runtime.sendMessage({ action: 'pullFromBackend' });
-  }
-}
-
-function updateSyncUI(status) {
-  const statusDiv = document.getElementById('sync-status');
-  const syncText = document.getElementById('sync-text');
-  const syncBtn = document.getElementById('sync-btn');
-  const syncDot = document.querySelector('.sync-dot');
-
-  if (!statusDiv) return;
-
-  statusDiv.style.display = 'flex';
-
-  if (status.isAuthenticated && status.syncEnabled) {
-    syncText.textContent = 'Synced';
-    syncBtn.textContent = '🔄 Refresh';
-    syncDot.classList.add('connected');
-  } else if (status.isAuthenticated) {
-    syncText.textContent = 'Connected';
-    syncBtn.textContent = 'Sync Now';
-  } else {
-    syncText.textContent = 'Not connected';
-    syncBtn.textContent = 'Connect';
-  }
-}
-
 // ============================================
 // INITIALIZATION
 // ============================================
 
 // Initialize the popup
 document.addEventListener('DOMContentLoaded', () => {
-
-  // NEW: Check sync status
-  chrome.runtime.sendMessage({ action: 'checkSyncStatus' }, (response) => {
-    if (response) updateSyncUI(response);
-  });
-  
-  // Sync button
-  document.getElementById('sync-btn')?.addEventListener('click', handleSyncClick);
 
   // Load saved sort preference
   chrome.storage.local.get(['sortPreference'], (result) => {

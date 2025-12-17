@@ -2,20 +2,15 @@
     "manifest_version": 3,
     "name": "The Dressing Room",
     "version": "2.0",
-    "description": "Save fashion items from any store - Now with cloud sync!",
+    "description": "Save fashion items from any store and track prices!",
     "permissions": [
       "storage",
       "activeTab",
-      "scripting",
-      "identity",
-      "alarms"
-    ],
-    "host_permissions": [
-      "https://*.supabase.co/*"
+      "scripting"
     ],
     "web_accessible_resources": [
       {
-        "resources": ["compare.html", "compare.js", "oauth-callback.html"],
+        "resources": ["compare.html", "compare.js"],
         "matches": ["<all_urls>"]
       }
     ],
@@ -26,8 +21,7 @@
       }
     ],
     "background": {
-      "service_worker": "background.js",
-      "type": "module"
+      "service_worker": "background.js"
     },
     "action": {
       "default_popup": "popup.html"

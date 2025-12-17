@@ -1496,45 +1496,6 @@
       background: var(--deep-taupe);
     }
 
-    .sync-status {
-      background: var(--warm-beige);
-      border: 1px solid var(--soft-taupe);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .sync-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sync-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #c65d47;
-    }
-
-    .sync-dot.connected {
-      background: #7a9b76;
-      animation: pulse 2s infinite;
-    }
-
-    .sync-action-btn {
-      background: var(--accent-gold);
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 16px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
   </style>
 </head>
 <body>
@@ -1544,14 +1505,6 @@
         <span>🪞 Your Dressing Room</span>
         <button id="clear-all-btn" class="clear-all-btn" style="display: none;">Clear All</button>
       </h2>
-      
-      <div id="sync-status" class="sync-status" style="display: none;">
-        <div class="sync-indicator">
-          <div class="sync-dot"></div>
-          <span id="sync-text">Not connected</span>
-        </div>
-        <button id="sync-btn" class="sync-action-btn">Connect</button>
-      </div>
 
       <div class="action-buttons">
         <button id="save-toggle-btn" class="save-toggle-btn">💾 Save Button</button>

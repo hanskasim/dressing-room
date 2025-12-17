@@ -1,75 +1,177 @@
-# The Dressing Room - Chrome Extension
+# 🪞 The Dressing Room - Chrome Extension
 
-A Chrome extension to save and track fashion items from any store with cloud sync.
+Save and track fashion items from any online store. Your personal virtual dressing room for curating the perfect wardrobe!
 
-## 🔒 Security Setup (IMPORTANT)
+## ✨ Features
 
-This project uses Supabase for cloud sync. **Your credentials are sensitive and should never be committed to Git.**
+- **💾 Save Items**: One-click save from any fashion website
+- **📊 Price Tracking**: Automatic price history and trend detection
+- **🏷️ Sale Detection**: Identifies sale items and original prices
+- **⚖️ Compare Mode**: Side-by-side comparison of saved items
+- **🔍 Smart Filters**: Filter by brand, favorites, price range
+- **📈 Price Alerts**: See when prices drop or increase
+- **📸 Multi-Image Support**: Save product galleries
+- **🎨 Beautiful UI**: Warm, dressing room-inspired design
 
-### First-Time Setup:
+## 🚀 Installation
 
-1. **Create your config file:**
-   ```bash
-   cp config.example.js config.js
-   ```
+### Install from Chrome Web Store
+*(Coming soon - extension under review)*
 
-2. **Add your Supabase credentials:**
-   - Go to [https://supabase.com](https://supabase.com)
-   - Create a new project or use an existing one
-   - Go to Settings > API
-   - Copy your credentials:
-     - Project URL
-     - anon/public key
-   - Paste them into `config.js`
+### Install Locally (Developer Mode)
 
-3. **Verify config.js is in .gitignore:**
-   - The `.gitignore` file already excludes `config.js`
-   - Never commit `config.js` to version control
+1. Clone or download this repository
+2. Open Chrome and go to `chrome://extensions/`
+3. Enable "Developer mode" (toggle in top right)
+4. Click "Load unpacked"
+5. Select the `dressing-room` folder
 
-## 📦 Installation
+## 📖 How to Use
 
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable "Developer mode" (toggle in top right)
-3. Click "Load unpacked"
-4. Select this directory
+### Saving Items
 
-## 🚀 Features
+1. Click the extension icon and click **"Show Save Button"**
+2. Visit any fashion website (Uniqlo, H&M, Zara, Nike, etc.)
+3. On a product page, click the **"🪞 Save to Dressing Room"** button
+4. Item is saved with price, images, and metadata!
 
-- Save fashion items from any website
-- Track price history
-- Multi-image support
-- Brand filters and search
-- Cloud sync with Supabase
-- Compare items side-by-side
+### Viewing Your Collection
 
-## 🔐 Security Notes
+1. Click the extension icon to open your dressing room
+2. Browse all saved items with images and prices
+3. Filter by brand using the brand icons
+4. Click the star (⭐) to favorite items
+5. Use the sort dropdown to organize by price, date, brand, or name
 
-**Files that contain sensitive data (already in .gitignore):**
-- `config.js` - Contains your Supabase credentials
-- `.env*` - Environment files
+### Tracking Prices
 
-**Safe to commit:**
-- `config.example.js` - Template file with no real credentials
-- All other `.js`, `.html`, `.css` files
-- `manifest.json`
+1. Click **"🔄 Refresh Prices"** to check current prices
+2. See price trends with up/down indicators
+3. Click **"📊 Price History"** on any item to see historical data
+4. Items show freshness indicators (🟢 Fresh, 🟡 Recent, 🟠 Stale)
+
+### Comparing Items
+
+1. Save at least 2 items
+2. Click **"⚖️ Compare"** button
+3. View items side-by-side with detailed comparisons
+4. See price differences, images, and specifications
+
+## 🛠️ Technical Details
+
+- **Manifest V3** compliant
+- **Local storage** via Chrome Storage API
+- **Smart detection** for product names, prices, images
+- **Structured data** parsing (JSON-LD)
+- **Sale detection** across multiple retailers
+- **No external dependencies** - works completely offline
+
+## 🏪 Supported Stores
+
+Works on virtually any e-commerce site, with enhanced detection for:
+
+- Uniqlo
+- H&M
+- Zara
+- Nike
+- Adidas
+- Gap, Old Navy, Banana Republic
+- J.Crew, Madewell
+- Aritzia
+- Forever 21
+- And many more!
+
+## 🔒 Privacy & Security
+
+- **100% local** - all data stored on your device
+- **No tracking** - we don't collect any personal information
+- **No accounts required** - works immediately
+- **Offline-first** - internet only needed for price checks
+
+## 🗂️ File Structure
+
+```
+dressing-room/
+├── manifest.json          # Extension configuration
+├── content.js            # Product detection & save button
+├── popup.html           # Main UI
+├── popup.js             # UI logic
+├── background.js        # Background worker
+├── compare.html         # Comparison view
+├── compare.js           # Comparison logic
+├── config.example.js    # Configuration template
+└── README.md            # This file
+```
+
+## 🔮 Future Features
+
+Cloud sync and web app access are planned for v3.0! Files for this feature are in `future-features/cloud-sync/`.
+
+Planned features:
+- ☁️ Cloud sync across devices
+- 🌐 Web app version
+- 📱 Mobile companion app
+- 🤝 Share collections with friends
+- 🤖 AI-powered style recommendations
+
+## 🐛 Troubleshooting
+
+### Save button not appearing?
+- Make sure you clicked "Show Save Button" in the extension popup
+- Refresh the product page
+- Check that you're on a product detail page (not a category/listing page)
+
+### Price detection not working?
+- Some sites have complex layouts - detection works best on major retailers
+- Structured data (when available) provides most accurate results
+
+### Items not saving?
+- Check Chrome Storage permissions in `chrome://extensions/`
+- Clear extension data and try again
 
 ## 📝 Development
 
-The extension uses:
-- Manifest V3
-- Supabase for backend/auth
-- Chrome Storage API for local caching
-- Content scripts for product detection
+### Setting Up
 
-## ⚠️ Before Pushing to GitHub
-
-1. Make sure `config.js` is NOT staged for commit
-2. Check `.gitignore` includes `config.js`
-3. Never share your Supabase credentials publicly
-
-To verify what will be committed:
 ```bash
-git status
+git clone https://github.com/hanskasim/dressing-room.git
+cd dressing-room
 ```
 
-Make sure `config.js` does NOT appear in the list!
+### Making Changes
+
+1. Edit the files
+2. Go to `chrome://extensions/`
+3. Click reload (🔄) on the extension
+4. Test your changes
+
+### Configuration
+
+Create `config.js` from `config.example.js`:
+```bash
+cp config.example.js config.js
+```
+
+## 🤝 Contributing
+
+Contributions welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+
+## 📄 License
+
+MIT License - feel free to use and modify!
+
+## 🙏 Credits
+
+Built with ❤️ by Hans Kasim
+
+Powered by:
+- Chrome Extension APIs
+- Vanilla JavaScript
+- Love for fashion and organization
+
+---
+
+**Note:** This extension does not collect, store, or transmit any personal data. All information is stored locally on your device.
