@@ -15,7 +15,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["compare.html", "compare.js"],
+        "resources": ["compare.html", "compare.js", "oauth-callback.html"],
         "matches": ["<all_urls>"]
       }
     ],

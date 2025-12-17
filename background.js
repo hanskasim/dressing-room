@@ -101,7 +101,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           await supabaseClient.configure(request.url, request.key);
           sendResponse({ success: true });
           break;
-          
+
+        case 'handleOAuthCallback':
+          await handleOAuthCallback(request);
+          sendResponse({ success: true });
+          break;
+
         default:
           sendResponse({ success: false, error: 'Unknown action' });
       }
@@ -120,35 +125,42 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleSignIn() {
   console.log('🔐 Starting sign in...');
-  
+
   // Make sure Supabase is initialized
   const initialized = await supabaseClient.initialize();
   if (!initialized) {
     throw new Error('Supabase not initialized. Check config.js');
   }
-  
+
   try {
+    // Get the extension's OAuth callback URL
+    const extensionId = chrome.runtime.id;
+    const redirectUrl = `https://${extensionId}.chromiumapp.org/oauth-callback.html`;
+
+    console.log('📍 Redirect URL:', redirectUrl);
+    console.log('📍 Extension ID:', extensionId);
+
     // Open auth URL in new tab
     const { data, error } = await supabaseClient.supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: chrome.identity.getRedirectURL(),
+        redirectTo: redirectUrl,
         skipBrowserRedirect: false
       }
     });
-    
+
     if (error) {
       console.error('❌ Auth error:', error);
       throw error;
     }
-    
+
     console.log('✅ Auth URL generated:', data.url);
-    
+
     // Open in new tab
     if (data.url) {
       chrome.tabs.create({ url: data.url });
     }
-    
+
   } catch (error) {
     console.error('❌ Sign in failed:', error);
     throw error;
@@ -158,12 +170,50 @@ async function handleSignIn() {
 async function handleSignOut() {
   console.log('🔐 Signing out...');
   await supabaseClient.signOut();
-  
+
   // Disable sync
   await chrome.storage.local.set({ syncEnabled: false });
-  
+
   // Notify popup
   notifyPopup({ action: 'syncDisabled' });
+}
+
+async function handleOAuthCallback(request) {
+  console.log('🔐 Handling OAuth callback...');
+  console.log('📦 Received hash:', request.hash);
+
+  try {
+    // The hash contains the auth tokens from Supabase
+    // Set the session using the tokens
+    const { data, error } = await supabaseClient.supabase.auth.setSession({
+      access_token: request.access_token,
+      refresh_token: request.refresh_token
+    });
+
+    if (error) {
+      console.error('❌ Session error:', error);
+      throw error;
+    }
+
+    console.log('✅ Session established:', data);
+
+    // Update user in client
+    supabaseClient.user = data.user;
+
+    // Enable sync
+    await chrome.storage.local.set({ syncEnabled: true });
+
+    // Trigger initial sync
+    await syncAllProducts();
+
+    // Notify popup
+    notifyPopup({ action: 'authComplete', user: data.user });
+
+    console.log('✅ OAuth callback handled successfully');
+  } catch (error) {
+    console.error('❌ OAuth callback failed:', error);
+    throw error;
+  }
 }
 
 // ============================================

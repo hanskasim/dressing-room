@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Authentication Callback</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #f5f1eb 0%, #e8e0d6 100%);
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #d4a574;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    h2 {
+      color: #5a4a3a;
+      margin: 0 0 0.5rem 0;
+    }
+    p {
+      color: #8a7a6a;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spinner"></div>
+    <h2>Completing sign in...</h2>
+    <p>Please wait while we complete authentication</p>
+  </div>
+
+  <script type="module">
+    // This page handles the OAuth callback from Supabase
+    console.log('OAuth callback page loaded');
+    console.log('Current URL:', window.location.href);
+
+    // Extract the hash fragment (contains the auth tokens)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const access_token = hashParams.get('access_token');
+    const refresh_token = hashParams.get('refresh_token');
+
+    console.log('Access token present:', !!access_token);
+    console.log('Refresh token present:', !!refresh_token);
+
+    if (access_token) {
+      // Send tokens to background script
+      chrome.runtime.sendMessage({
+        action: 'handleOAuthCallback',
+        access_token: access_token,
+        refresh_token: refresh_token,
+        hash: window.location.hash
+      }, (response) => {
+        console.log('Message sent to background, response:', response);
+
+        // Close this tab after a brief delay
+        setTimeout(() => {
+          window.close();
+        }, 1000);
+      });
+    } else {
+      console.error('No access token found in URL');
+      document.querySelector('h2').textContent = 'Authentication failed';
+      document.querySelector('p').textContent = 'Please try again';
+    }
+  </script>
+</body>
+</html>
