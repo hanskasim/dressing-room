@@ -135,7 +135,7 @@ async function handleSignIn() {
   try {
     // Get the extension's OAuth callback URL
     const extensionId = chrome.runtime.id;
-    const redirectUrl = `https://${extensionId}.chromiumapp.org/oauth-callback.html`;
+    const redirectUrl = chrome.runtime.getURL('oauth-callback.html');
 
     console.log('📍 Redirect URL:', redirectUrl);
     console.log('📍 Extension ID:', extensionId);
