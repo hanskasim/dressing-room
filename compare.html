@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Items - Dressing Room</title>
+  <style>
+    :root {
+      --cream-white: #faf9f7;
+      --warm-beige: #f5f1eb;
+      --soft-taupe: #e8e0d6;
+      --accent-gold: #d4a574;
+      --deep-taupe: #a8947a;
+      --warm-gray: #c9c0b5;
+      --mirror-silver: #e5e1dc;
+      --text-dark: #3a3a3a;
+      --text-medium: #5a4a3a;
+      --text-warm-dark: #4a3a2a;
+      --gentle-shadow: rgba(139, 115, 85, 0.15);
+      --soft-glow: rgba(212, 165, 116, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, var(--warm-beige) 0%, var(--cream-white) 100%);
+      color: var(--text-dark);
+      padding: 0;
+      margin: 0;
+      min-width: 1000px;
+      min-height: 600px;
+      overflow: hidden;
+    }
+
+    .layout {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: white;
+      border-right: 1px solid var(--warm-gray);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      background: linear-gradient(135deg, var(--warm-beige), var(--mirror-silver));
+      border-bottom: 1px solid var(--warm-gray);
+    }
+
+    .sidebar-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-medium);
+      margin-bottom: 12px;
+    }
+
+    .filters {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-select {
+      padding: 6px 8px;
+      border: 1px solid var(--warm-gray);
+      border-radius: 8px;
+      background: white;
+      font-size: 12px;
+      color: var(--text-dark);
+      cursor: pointer;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--accent-gold);
+    }
+
+    .saved-items-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .sidebar-item {
+      background: var(--cream-white);
+      border: 1px solid var(--warm-gray);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      cursor: grab;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .sidebar-item:hover {
+      border-color: var(--accent-gold);
+      background: var(--soft-glow);
+      transform: translateX(4px);
+    }
+
+    .sidebar-item:active {
+      cursor: grabbing;
+    }
+
+    .sidebar-item.selected {
+      border: 2px solid var(--accent-gold);
+      background: var(--soft-glow);
+    }
+
+    .selection-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      background: var(--accent-gold);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid white;
+      box-shadow: 0 2px 8px var(--gentle-shadow);
+    }
+
+    .sidebar-item-content {
+      display: flex;
+      gap: 12px;
+    }
+
+    .sidebar-item-image {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: var(--soft-taupe);
+      flex-shrink: 0;
+    }
+
+    .sidebar-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar-item-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dark);
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-item-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .sidebar-item-store {
+      color: var(--text-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .sidebar-item-price {
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--warm-beige), var(--mirror-silver));
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px var(--gentle-shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-medium);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .close-btn {
+      background: var(--text-medium);
+      color: var(--cream-white);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: var(--text-warm-dark);
+      transform: translateY(-1px);
+    }
+
+    .instructions {
+      background: var(--soft-glow);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border-left: 4px solid var(--accent-gold);
+      font-size: 14px;
+      color: var(--text-medium);
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .compare-slot {
+      background: white;
+      border: 2px dashed var(--warm-gray);
+      border-radius: 16px;
+      padding: 20px;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .compare-slot.filled {
+      border: 2px solid var(--accent-gold);
+      background: var(--cream-white);
+    }
+
+    .compare-slot.drag-over {
+      border-color: var(--accent-gold);
+      background: var(--soft-glow);
+      transform: scale(1.02);
+    }
+
+    .compare-slot.empty {
+      cursor: pointer;
+    }
+
+    .compare-slot.empty:hover {
+      border-color: var(--accent-gold);
+      background: var(--soft-glow);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-medium);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .product-card {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: var(--soft-taupe);
+    }
+
+    .product-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.4;
+    }
+
+    .product-price {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .product-store {
+      font-size: 12px;
+      color: var(--text-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .product-details {
+      font-size: 13px;
+      color: var(--text-medium);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--warm-gray);
+    }
+
+    .detail-label {
+      font-weight: 500;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--text-medium);
+      color: white;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .remove-btn:hover {
+      background: #c65d47;
+      transform: scale(1.1);
+    }
+
+    .favorite-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      opacity: 0.7;
+      box-shadow: 0 2px 6px var(--gentle-shadow);
+    }
+
+    .favorite-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+      background: var(--soft-glow);
+    }
+
+    .favorite-btn.active {
+      opacity: 1;
+      color: var(--accent-gold);
+      text-shadow: 0 0 8px rgba(212, 165, 116, 0.3);
+    }
+
+    .favorite-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--text-dark);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .favorite-btn:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(4px);
+    }
+
+    .sale-badge {
+      background: #c65d47;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .action-btn {
+      background: var(--accent-gold);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 24px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+      background: var(--deep-taupe);
+      transform: translateY(-1px);
+    }
+
+    .action-btn.secondary {
+      background: var(--warm-gray);
+    }
+
+    .action-btn.secondary:hover {
+      background: var(--text-medium);
+    }
+
+    #product-selector {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #product-selector.active {
+      display: flex;
+    }
+
+    .selector-modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .selector-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-medium);
+    }
+
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .product-list-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--warm-gray);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .product-list-item:hover {
+      border-color: var(--accent-gold);
+      background: var(--soft-glow);
+    }
+
+    .product-list-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-list-item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .product-list-item-name {
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+
+    .product-list-item-price {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-gold);
+    }
+
+    .product-list-item-store {
+      font-size: 11px;
+      color: var(--text-medium);
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar with saved items -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Saved Items</div>
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Filter by Brand</label>
+            <select class="filter-select" id="brand-filter">
+              <option value="all">All Brands</option>
+              <!-- Brand options will be populated dynamically -->
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Show</label>
+            <select class="filter-select" id="favorites-filter">
+              <option value="all">All Items</option>
+              <option value="favorites">Favorites Only</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="saved-items-list" id="saved-items-list">
+        <!-- Saved items will be rendered here -->
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-content">
+      <div class="container">
+        <header>
+          <h1>⚖️ Compare Items</h1>
+          <button class="close-btn" id="close-window">Close</button>
+        </header>
+
+        <div class="instructions">
+          ℹ️ Drag items from the sidebar into the comparison slots below. You can compare up to 4 items side by side.
+        </div>
+
+        <div class="compare-grid" id="compare-grid">
+          <!-- Compare slots will be dynamically generated -->
+        </div>
+
+        <div class="actions">
+          <button class="action-btn secondary" id="clear-all">Clear All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="compare.js"></script>
+</body>
+</html>
