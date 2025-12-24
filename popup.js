@@ -1273,7 +1273,9 @@ function extractStructuredData(doc) {
 
 function extractPriceSemantically(doc) {
   const pricePattern = /\$\s*(\d{1,4}(?:[.,]\d{2})?)/;
-  const priceElements = doc.querySelectorAll('[class*="price"], [id*="price"], [data-price], [data-testid*="price"]');
+  // ENHANCED: Also search all span and div elements, not just those with "price" in class
+  // This handles sites like H&M that use obfuscated class names
+  const priceElements = doc.querySelectorAll('[class*="price"], [id*="price"], [data-price], [data-testid*="price"], span, div');
 
   const candidates = [];
 
@@ -1281,12 +1283,19 @@ function extractPriceSemantically(doc) {
     const text = el.textContent.trim();
     const match = text.match(pricePattern);
 
-    if (match && text.length < 50) {
+    const classList = el.className.toLowerCase();
+    const dataTestId = el.getAttribute('data-testid')?.toLowerCase() || '';
+
+    // ENHANCED: For elements without "price" in class, ensure text is ONLY a price (no other text)
+    // This prevents matching navigation text like "Shop $50 and under"
+    const isPriceOnlyText = text.length < 20 && text.replace(/[\$\s\d.,]/g, '').length === 0;
+    const hasPriceInClass = classList.includes('price') ||
+                            dataTestId.includes('price') ||
+                            el.hasAttribute('data-price');
+
+    if (match && (hasPriceInClass || isPriceOnlyText)) {
       const price = parseFloat(match[1].replace(',', ''));
       if (price < 1 || price > 10000) continue;
-
-      const classList = el.className.toLowerCase();
-      const dataTestId = el.getAttribute('data-testid')?.toLowerCase() || '';
 
       // CRITICAL: Check if this is a strikethrough/old price (should be EXCLUDED)
       const isOldPrice = classList.includes('strike') ||

@@ -430,12 +430,14 @@ function isValidProductName(text) {
 
 function findPrice(productArea) {
   console.log('🔍 Finding price...');
-  
+
   const searchArea = productArea || document.body;
   const pricePattern = /\$\s*(\d{1,4}(?:[.,]\d{2})?)/;
-  
+
   const candidates = [];
-  const priceElements = searchArea.querySelectorAll('[class*="price"], [id*="price"], [data-price], [data-testid*="price"]');
+  // ENHANCED: Also search all span and div elements, not just those with "price" in class
+  // This handles sites like H&M that use obfuscated class names
+  const priceElements = searchArea.querySelectorAll('[class*="price"], [id*="price"], [data-price], [data-testid*="price"], span, div');
   
   for (const el of priceElements) {
     // ENHANCEMENT: Don't skip hidden elements if they have price-related attributes
@@ -452,8 +454,13 @@ function findPrice(productArea) {
     
     const text = el.textContent.trim();
     const match = text.match(pricePattern);
-    
-    if (match && text.length < 50) {
+
+    // ENHANCED: For elements without "price" in class, ensure text is ONLY a price (no other text)
+    // This prevents matching navigation text like "Shop $50 and under"
+    const isPriceOnlyText = text.length < 20 && text.replace(/[\$\s\d.,]/g, '').length === 0;
+    const hasPriceInClass = el.className.toLowerCase().includes('price') || hasStrongPriceIndicator;
+
+    if (match && (hasPriceInClass || isPriceOnlyText)) {
       const price = parseFloat(match[1].replace(',', ''));
       if (price < 1 || price > 10000) continue;
       
