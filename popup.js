@@ -48,6 +48,209 @@ const BRAND_DOMAINS = {
 };
 
 // ============================================
+// CURRENCY CONFIGURATION (v2.1)
+// ============================================
+
+const CURRENCY_CONFIG = {
+  USD: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*USD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 10000
+  },
+  EUR: {
+    patterns: [
+      /€\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/,
+      /(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)\s*EUR/,
+      /(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)\s*€/
+    ],
+    symbol: '€',
+    decimalSep: ',',
+    thousandsSep: '.',
+    maxPrice: 10000
+  },
+  GBP: {
+    patterns: [
+      /£\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*GBP/
+    ],
+    symbol: '£',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 10000
+  },
+  JPY: {
+    patterns: [
+      /¥\s*(\d{1,3}(?:,\d{3})*)/,
+      /(\d{1,3}(?:,\d{3})*)\s*円/,
+      /(\d{1,3}(?:,\d{3})*)\s*JPY/
+    ],
+    symbol: '¥',
+    decimalSep: null,
+    thousandsSep: ',',
+    maxPrice: 1000000
+  },
+  IDR: {
+    patterns: [
+      /Rp\s*(\d{1,3}(?:\.\d{3})*)/,
+      /(\d{1,3}(?:\.\d{3})*)\s*Rp/
+    ],
+    symbol: 'Rp',
+    decimalSep: null,
+    thousandsSep: '.',
+    maxPrice: 10000000
+  },
+  PHP: {
+    patterns: [
+      /₱\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /PHP\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*PHP/
+    ],
+    symbol: '₱',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 500000
+  },
+  THB: {
+    patterns: [
+      /฿\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*THB/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*฿/
+    ],
+    symbol: '฿',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 300000
+  },
+  VND: {
+    patterns: [
+      /₫\s*(\d{1,3}(?:[.,]\d{3})*)/,
+      /(\d{1,3}(?:[.,]\d{3})*)\s*VND/,
+      /(\d{1,3}(?:[.,]\d{3})*)\s*₫/
+    ],
+    symbol: '₫',
+    decimalSep: null,
+    thousandsSep: '.',
+    maxPrice: 200000000
+  },
+  SEK: {
+    patterns: [
+      /(\d{1,3}(?:\s\d{3})*(?:,\d{2})?)\s*kr/,
+      /(\d{1,3}(?:\s\d{3})*(?:,\d{2})?)\s*SEK/
+    ],
+    symbol: 'kr',
+    decimalSep: ',',
+    thousandsSep: ' ',
+    maxPrice: 100000
+  },
+  NOK: {
+    patterns: [
+      /(\d{1,3}(?:\s\d{3})*(?:,\d{2})?)\s*kr/,
+      /(\d{1,3}(?:\s\d{3})*(?:,\d{2})?)\s*NOK/
+    ],
+    symbol: 'kr',
+    decimalSep: ',',
+    thousandsSep: ' ',
+    maxPrice: 100000
+  },
+  DKK: {
+    patterns: [
+      /(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)\s*kr/,
+      /(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)\s*DKK/
+    ],
+    symbol: 'kr',
+    decimalSep: ',',
+    thousandsSep: '.',
+    maxPrice: 70000
+  },
+  CNY: {
+    patterns: [
+      /¥\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*元/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*CNY/
+    ],
+    symbol: '¥',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 70000
+  },
+  KRW: {
+    patterns: [
+      /₩\s*(\d{1,3}(?:,\d{3})*)/,
+      /(\d{1,3}(?:,\d{3})*)\s*원/,
+      /(\d{1,3}(?:,\d{3})*)\s*KRW/
+    ],
+    symbol: '₩',
+    decimalSep: null,
+    thousandsSep: ',',
+    maxPrice: 12000000
+  },
+  MXN: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*MXN/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 200000
+  },
+  CAD: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*CAD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 13000
+  },
+  AUD: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*AUD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 15000
+  }
+};
+
+// Helper function to parse international prices
+function parseInternationalPrice(priceString, currency) {
+  const config = CURRENCY_CONFIG[currency];
+  if (!config) return 0;
+
+  let numericString = priceString
+    .replace(/[A-Za-z₱฿₫₩¥£€\$Rp]/g, '')
+    .trim();
+
+  // Handle different separator formats
+  if (config.thousandsSep === '.') {
+    // Indonesian/German format: 299.000,50
+    numericString = numericString.replace(/\./g, '').replace(',', '.');
+  } else if (config.thousandsSep === ',') {
+    // US/UK format: 299,000.50
+    numericString = numericString.replace(/,/g, '');
+  } else if (config.thousandsSep === ' ') {
+    // Swedish format: 299 000,50
+    numericString = numericString.replace(/\s/g, '').replace(',', '.');
+  }
+
+  const numericPrice = parseFloat(numericString);
+
+  if (isNaN(numericPrice) || numericPrice < 1) return 0;
+  if (numericPrice > config.maxPrice) return 0;
+
+  return numericPrice;
+}
+
+// ============================================
 // UTILITY FUNCTIONS
 // ============================================
 
@@ -794,10 +997,59 @@ function renderProducts() {
 
   const products = getSortedProducts();
   const totalItems = products.length;
-  const totalPrice = products.reduce((sum, item) => sum + parsePrice(item.price), 0);
+
+  // MULTI-CURRENCY: Group totals by currency
+  const currencyTotals = {};
+  products.forEach(item => {
+    const currency = item.currency || 'USD';
+    const currencySymbol = item.currencySymbol || '$';
+    const numericPrice = item.priceHistory?.[item.priceHistory.length - 1]?.numericPrice || parsePrice(item.price);
+
+    if (!currencyTotals[currency]) {
+      currencyTotals[currency] = {
+        total: 0,
+        count: 0,
+        symbol: currencySymbol
+      };
+    }
+    currencyTotals[currency].total += numericPrice;
+    currencyTotals[currency].count++;
+  });
 
   totalCountDiv.textContent = `Items: ${totalItems}`;
-  totalPriceDiv.textContent = `Total: $${totalPrice.toFixed(2)}`;
+
+  // Display totals grouped by currency
+  const currencies = Object.keys(currencyTotals);
+  if (currencies.length === 1) {
+    // Single currency: simple display
+    const currency = currencies[0];
+    const data = currencyTotals[currency];
+    const config = CURRENCY_CONFIG[currency] || CURRENCY_CONFIG.USD;
+
+    if (config.decimalSep === null) {
+      // No decimals for JPY, IDR, etc.
+      totalPriceDiv.textContent = `Total: ${data.symbol}${Math.round(data.total).toLocaleString()}`;
+    } else {
+      totalPriceDiv.textContent = `Total: ${data.symbol}${data.total.toFixed(2)}`;
+    }
+  } else {
+    // Multiple currencies: show breakdown
+    const totalParts = currencies.map(currency => {
+      const data = currencyTotals[currency];
+      const config = CURRENCY_CONFIG[currency] || CURRENCY_CONFIG.USD;
+
+      let formattedTotal;
+      if (config.decimalSep === null) {
+        formattedTotal = `${data.symbol}${Math.round(data.total).toLocaleString()}`;
+      } else {
+        formattedTotal = `${data.symbol}${data.total.toFixed(2)}`;
+      }
+
+      return `${currency}: ${data.count} • ${formattedTotal}`;
+    });
+
+    totalPriceDiv.textContent = totalParts.join(' | ');
+  }
 
   clearAllBtn.style.display = totalItems > 0 ? 'block' : 'none';
 
@@ -1190,16 +1442,16 @@ async function checkSinglePrice(product) {
     
     // Try to extract price using the same logic as content.js
     const newPriceInfo = extractPriceFromDocument(doc);
-    
+
     if (newPriceInfo && newPriceInfo.price && newPriceInfo.price !== 'Price not found') {
       const oldNumericPrice = parsePrice(product.price);
-      const newNumericPrice = parsePrice(newPriceInfo.price);
-      
+      const newNumericPrice = newPriceInfo.numericPrice || parsePrice(newPriceInfo.price);
+
       // Determine if price changed
       const priceChanged = Math.abs(oldNumericPrice - newNumericPrice) > 0.01;
       const priceIncreased = newNumericPrice > oldNumericPrice;
       const priceDecreased = newNumericPrice < oldNumericPrice;
-      
+
       return {
         success: true,
         priceChanged,
@@ -1209,6 +1461,8 @@ async function checkSinglePrice(product) {
         newPrice: newPriceInfo.price,
         oldNumericPrice,
         newNumericPrice,
+        currency: newPriceInfo.currency || 'USD',
+        currencySymbol: newPriceInfo.currencySymbol || '$',
         isSale: newPriceInfo.isSale || false
       };
     } else {
@@ -1240,24 +1494,31 @@ function extractPriceFromDocument(doc) {
 
 function extractStructuredData(doc) {
   const scripts = doc.querySelectorAll('script[type="application/ld+json"]');
-  
+
   for (const script of scripts) {
     try {
       const data = JSON.parse(script.textContent);
       const products = Array.isArray(data) ? data : [data];
-      
+
       for (const item of products) {
-        const isProduct = item['@type'] === 'Product' || 
+        const isProduct = item['@type'] === 'Product' ||
                          (Array.isArray(item['@type']) && item['@type'].includes('Product'));
-        
+
         if (isProduct && item.offers) {
           const offers = Array.isArray(item.offers) ? item.offers : [item.offers];
           const offer = offers[0];
-          
+
           if (offer && offer.price) {
-            const price = formatPrice(offer.price, offer.priceCurrency);
+            const currency = offer.priceCurrency || 'USD';
+            const price = formatPrice(offer.price, currency);
+            const numericPrice = parseFloat(offer.price);
+            const config = CURRENCY_CONFIG[currency] || CURRENCY_CONFIG.USD;
+
             return {
               price: price,
+              numericPrice: numericPrice,
+              currency: currency,
+              currencySymbol: config.symbol,
               isSale: !!offer.highPrice && parseFloat(offer.price) < parseFloat(offer.highPrice)
             };
           }
@@ -1267,12 +1528,11 @@ function extractStructuredData(doc) {
       // Silent fail, try next script
     }
   }
-  
+
   return null;
 }
 
 function extractPriceSemantically(doc) {
-  const pricePattern = /\$\s*(\d{1,4}(?:[.,]\d{2})?)/;
   // ENHANCED: Also search all span and div elements, not just those with "price" in class
   // This handles sites like H&M that use obfuscated class names
   const priceElements = doc.querySelectorAll('[class*="price"], [id*="price"], [data-price], [data-testid*="price"], span, div');
@@ -1281,21 +1541,38 @@ function extractPriceSemantically(doc) {
 
   for (const el of priceElements) {
     const text = el.textContent.trim();
-    const match = text.match(pricePattern);
 
     const classList = el.className.toLowerCase();
     const dataTestId = el.getAttribute('data-testid')?.toLowerCase() || '';
 
+    // MULTI-CURRENCY: Try all currency patterns instead of just USD
+    let matchedCurrency = null;
+    let match = null;
+
+    for (const [currencyCode, config] of Object.entries(CURRENCY_CONFIG)) {
+      for (const pattern of config.patterns) {
+        match = text.match(pattern);
+        if (match) {
+          matchedCurrency = currencyCode;
+          break;
+        }
+      }
+      if (match) break;
+    }
+
+    if (!match) continue;
+
     // ENHANCED: For elements without "price" in class, ensure text is ONLY a price (no other text)
     // This prevents matching navigation text like "Shop $50 and under"
-    const isPriceOnlyText = text.length < 20 && text.replace(/[\$\s\d.,]/g, '').length === 0;
+    const isPriceOnlyText = text.length < 30 && text.replace(/[\$€£¥₱฿₫₩Rp\s\d.,]/g, '').length <= 2;
     const hasPriceInClass = classList.includes('price') ||
                             dataTestId.includes('price') ||
                             el.hasAttribute('data-price');
 
     if (match && (hasPriceInClass || isPriceOnlyText)) {
-      const price = parseFloat(match[1].replace(',', ''));
-      if (price < 1 || price > 10000) continue;
+      // Use multi-currency parsing
+      const numericPrice = parseInternationalPrice(text, matchedCurrency);
+      if (numericPrice === 0) continue; // Skip invalid prices
 
       // CRITICAL: Check if this is a strikethrough/old price (should be EXCLUDED)
       const isOldPrice = classList.includes('strike') ||
@@ -1330,8 +1607,10 @@ function extractPriceSemantically(doc) {
       const score = (hasPrice ? 20 : 0) + hasTestId + saleBonus;
 
       candidates.push({
-        price: match[0],
-        numericPrice: price,
+        price: match[0].trim(),
+        numericPrice: numericPrice,
+        currency: matchedCurrency,
+        currencySymbol: CURRENCY_CONFIG[matchedCurrency].symbol,
         element: el,
         score,
         isSale: isSalePrice
@@ -1344,9 +1623,11 @@ function extractPriceSemantically(doc) {
     candidates.sort((a, b) => b.score - a.score);
     const best = candidates[0];
 
-
     return {
       price: best.price,
+      numericPrice: best.numericPrice,
+      currency: best.currency,
+      currencySymbol: best.currencySymbol,
       isSale: best.isSale
     };
   }
@@ -1357,10 +1638,17 @@ function extractPriceSemantically(doc) {
 function formatPrice(price, currency = 'USD') {
   const numPrice = parseFloat(price);
   if (isNaN(numPrice)) return price.toString();
-  
-  const symbols = { USD: '$', EUR: '€', GBP: '£', JPY: '¥' };
-  const symbol = symbols[currency] || '$';
-  
+
+  const config = CURRENCY_CONFIG[currency];
+  if (!config) return `$${numPrice.toFixed(2)}`;
+
+  const symbol = config.symbol;
+
+  // Format based on currency (no decimals for JPY, IDR, etc.)
+  if (config.decimalSep === null) {
+    return `${symbol}${Math.round(numPrice).toLocaleString()}`;
+  }
+
   return `${symbol}${numPrice.toFixed(2)}`;
 }
 
@@ -1412,16 +1700,20 @@ async function checkAllPrices() {
         const globalIndex = allProducts.findIndex(p => p.url === product.url);
         if (globalIndex !== -1) {
           const timestamp = new Date().toISOString();
-          
+
           allProducts[globalIndex].price = result.newPrice;
+          allProducts[globalIndex].currency = result.currency;
+          allProducts[globalIndex].currencySymbol = result.currencySymbol;
           allProducts[globalIndex].updatedAt = timestamp;
           allProducts[globalIndex].lastChecked = timestamp;
-          
+
           // Add to price history
           allProducts[globalIndex].priceHistory.push({
             price: result.newPrice,
             timestamp: timestamp,
             numericPrice: result.newNumericPrice,
+            currency: result.currency,
+            currencySymbol: result.currencySymbol,
             isSale: result.isSale,
             confidence: 0.8,
             method: 'background-check'
@@ -1524,14 +1816,23 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.storage.local.get(['products'], (result) => {
     allProducts = Array.isArray(result.products) ? result.products : [];
     
-    // Migration for all data types including sale detection
+    // Migration for all data types including sale detection and multi-currency (v2.1)
     let migrationNeeded = false;
     allProducts.forEach(product => {
+      // MIGRATION v2.1: Add currency fields to products without them
+      if (!product.currency) {
+        product.currency = 'USD';
+        product.currencySymbol = '$';
+        migrationNeeded = true;
+      }
+
       if (!product.priceHistory && product.price) {
         product.priceHistory = [{
           price: product.price,
           timestamp: product.savedAt || new Date().toISOString(),
           numericPrice: parsePrice(product.price),
+          currency: product.currency || 'USD',
+          currencySymbol: product.currencySymbol || '$',
           // Initialize sale fields for existing products
           isSale: false,
           originalPrice: null,
@@ -1541,8 +1842,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }];
         migrationNeeded = true;
       }
-      
-      // Migrate existing price history entries to include sale fields
+
+      // Migrate existing price history entries to include sale fields and currency
       if (product.priceHistory) {
         product.priceHistory.forEach(entry => {
           if (entry.isSale === undefined) {
@@ -1551,6 +1852,13 @@ document.addEventListener('DOMContentLoaded', () => {
             entry.salePercentage = null;
             entry.saleType = null;
             entry.confidence = 0;
+            migrationNeeded = true;
+          }
+
+          // MIGRATION v2.1: Add currency to price history entries
+          if (!entry.currency) {
+            entry.currency = product.currency || 'USD';
+            entry.currencySymbol = product.currencySymbol || '$';
             migrationNeeded = true;
           }
         });
