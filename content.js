@@ -11,6 +11,156 @@ console.log('🪞 DRESSING ROOM v3.1: Enhanced detection loaded!');
 let saveButtonEnabled = false;
 
 // ============================================
+// MULTI-CURRENCY CONFIGURATION (v2.1)
+// ============================================
+
+const CURRENCY_CONFIG = {
+  USD: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*USD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 10000
+  },
+  EUR: {
+    patterns: [
+      /€\s*(\d{1,3}(?:[.,]\d{3})*(?:,\d{2})?)/,
+      /(\d{1,3}(?:[.,]\d{3})*(?:,\d{2})?)\s*€/,
+      /(\d{1,3}(?:[.,]\d{3})*(?:,\d{2})?)\s*EUR/
+    ],
+    symbol: '€',
+    decimalSep: ',',
+    thousandsSep: '.',
+    maxPrice: 10000
+  },
+  GBP: {
+    patterns: [
+      /£\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*GBP/
+    ],
+    symbol: '£',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 10000
+  },
+  JPY: {
+    patterns: [
+      /¥\s*(\d{1,3}(?:,\d{3})*)/,
+      /(\d{1,3}(?:,\d{3})*)\s*円/
+    ],
+    symbol: '¥',
+    decimalSep: null,
+    thousandsSep: ',',
+    maxPrice: 1000000
+  },
+  IDR: {
+    patterns: [
+      /Rp\s*(\d{1,3}(?:\.\d{3})*)/,
+      /(\d{1,3}(?:\.\d{3})*)\s*Rp/
+    ],
+    symbol: 'Rp',
+    decimalSep: null,
+    thousandsSep: '.',
+    maxPrice: 10000000
+  },
+  PHP: {
+    patterns: [
+      /₱\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /PHP\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/
+    ],
+    symbol: '₱',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 500000
+  },
+  THB: {
+    patterns: [
+      /฿\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*THB/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*บาท/
+    ],
+    symbol: '฿',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 300000
+  },
+  VND: {
+    patterns: [
+      /₫\s*(\d{1,3}(?:\.\d{3})*)/,
+      /(\d{1,3}(?:\.\d{3})*)\s*₫/,
+      /(\d{1,3}(?:\.\d{3})*)\s*VND/
+    ],
+    symbol: '₫',
+    decimalSep: null,
+    thousandsSep: '.',
+    maxPrice: 100000000
+  },
+  SEK: {
+    patterns: [
+      /(\d{1,3}(?:\s\d{3})*)\s*kr/i,
+      /(\d{1,3}(?:\s\d{3})*)\s*SEK/i
+    ],
+    symbol: 'kr',
+    decimalSep: ',',
+    thousandsSep: ' ',
+    maxPrice: 100000
+  },
+  CNY: {
+    patterns: [
+      /¥\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*元/
+    ],
+    symbol: '¥',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 70000
+  },
+  KRW: {
+    patterns: [
+      /₩\s*(\d{1,3}(?:,\d{3})*)/,
+      /(\d{1,3}(?:,\d{3})*)\s*원/
+    ],
+    symbol: '₩',
+    decimalSep: null,
+    thousandsSep: ',',
+    maxPrice: 10000000
+  },
+  MXN: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*MXN/,
+      /MXN\s*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 200000
+  },
+  CAD: {
+    patterns: [
+      /CAD\s*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*CAD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 15000
+  },
+  AUD: {
+    patterns: [
+      /AUD\s*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*AUD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 15000
+  }
+};
+
+// ============================================
 // UTILITY FUNCTIONS
 // ============================================
 
@@ -39,11 +189,91 @@ function extractBrand(hostname) {
 function formatStructuredPrice(price, currency = 'USD') {
   const numPrice = parseFloat(price);
   if (isNaN(numPrice)) return price.toString();
-  
+
   const symbols = { USD: '$', EUR: '€', GBP: '£', JPY: '¥' };
   const symbol = symbols[currency] || '$';
-  
+
   return `${symbol}${numPrice.toFixed(2)}`;
+}
+
+// ============================================
+// CURRENCY DETECTION & PARSING (v2.1)
+// ============================================
+
+function detectCurrency(priceString, url) {
+  console.log('   🔍 Detecting currency from:', priceString);
+
+  // Strategy 1: Try to match price pattern directly
+  for (const [code, config] of Object.entries(CURRENCY_CONFIG)) {
+    for (const pattern of config.patterns) {
+      if (pattern.test(priceString)) {
+        console.log(`   ✅ Matched ${code} via pattern`);
+        return code;
+      }
+    }
+  }
+
+  // Strategy 2: Fallback to URL-based detection for ambiguous symbols ($)
+  console.log('   ⚠️ No pattern match, checking URL...');
+  const urlLower = url.toLowerCase();
+
+  const URL_CURRENCY_MAP = {
+    '/id/': 'IDR', '/ph/': 'PHP', '/th/': 'THB', '/vn/': 'VND',
+    '/jp/': 'JPY', '/cn/': 'CNY', '/kr/': 'KRW', '/mx/': 'MXN',
+    '/ca/': 'CAD', '/au/': 'AUD', '/uk/': 'GBP', '/gb/': 'GBP',
+    '/eu/': 'EUR', '/de/': 'EUR', '/fr/': 'EUR', '/es/': 'EUR',
+    '/it/': 'EUR', '/se/': 'SEK'
+  };
+
+  for (const [urlPart, currency] of Object.entries(URL_CURRENCY_MAP)) {
+    if (urlLower.includes(urlPart)) {
+      console.log(`   ✅ Detected ${currency} from URL`);
+      return currency;
+    }
+  }
+
+  console.log('   ℹ️ Defaulting to USD');
+  return 'USD';
+}
+
+function parseInternationalPrice(priceString, currency) {
+  const config = CURRENCY_CONFIG[currency];
+  if (!config) return 0;
+
+  // Extract numeric part (remove currency symbols and letters)
+  let numericString = priceString
+    .replace(/[A-Za-z₱฿₫₩¥£€\$Rp]/g, '')
+    .trim();
+
+  // Handle different separator formats based on currency
+  if (config.thousandsSep === '.') {
+    // Indonesian/German format: 299.000,50
+    // Remove dots (thousands), replace comma with dot (decimal)
+    numericString = numericString.replace(/\./g, '').replace(',', '.');
+  } else if (config.thousandsSep === ',') {
+    // US/UK format: 299,000.50
+    // Remove commas (thousands), keep dot (decimal)
+    numericString = numericString.replace(/,/g, '');
+  } else if (config.thousandsSep === ' ') {
+    // Swedish format: 299 000,50
+    // Remove spaces (thousands), replace comma with dot (decimal)
+    numericString = numericString.replace(/\s/g, '').replace(',', '.');
+  }
+
+  const numericPrice = parseFloat(numericString);
+
+  if (isNaN(numericPrice) || numericPrice < 1) {
+    console.log(`   ⚠️ Invalid price after parsing: ${numericString}`);
+    return 0;
+  }
+
+  if (numericPrice > config.maxPrice) {
+    console.log(`   ⚠️ Price ${numericPrice} exceeds max for ${currency} (${config.maxPrice})`);
+    return 0;
+  }
+
+  console.log(`   ✅ Parsed ${priceString} → ${numericPrice} (${currency})`);
+  return numericPrice;
 }
 
 // ============================================
@@ -432,38 +662,54 @@ function findPrice(productArea) {
   console.log('🔍 Finding price...');
 
   const searchArea = productArea || document.body;
-  const pricePattern = /\$\s*(\d{1,4}(?:[.,]\d{2})?)/;
-
   const candidates = [];
+
   // ENHANCED: Also search all span and div elements, not just those with "price" in class
   // This handles sites like H&M that use obfuscated class names
   const priceElements = searchArea.querySelectorAll('[class*="price"], [id*="price"], [data-price], [data-testid*="price"], span, div');
-  
+
   for (const el of priceElements) {
     // ENHANCEMENT: Don't skip hidden elements if they have price-related attributes
     // Many sites (like Abercrombie) use aria-hidden with actual visible nested children
-    const hasStrongPriceIndicator = 
+    const hasStrongPriceIndicator =
       el.hasAttribute('data-testid') && el.getAttribute('data-testid').includes('price') ||
       el.hasAttribute('data-price') ||
       el.className.toLowerCase().includes('product-price');
-    
+
     // Skip only if truly invisible AND doesn't have strong indicators
     if (!hasStrongPriceIndicator && (el.offsetWidth === 0 || el.offsetHeight === 0)) {
       continue;
     }
-    
+
     const text = el.textContent.trim();
-    const match = text.match(pricePattern);
+
+    // MULTI-CURRENCY: Try all currency patterns instead of just USD
+    let matchedCurrency = null;
+    let match = null;
+
+    for (const [currencyCode, config] of Object.entries(CURRENCY_CONFIG)) {
+      for (const pattern of config.patterns) {
+        match = text.match(pattern);
+        if (match) {
+          matchedCurrency = currencyCode;
+          break;
+        }
+      }
+      if (match) break;
+    }
+
+    if (!match) continue;
 
     // ENHANCED: For elements without "price" in class, ensure text is ONLY a price (no other text)
     // This prevents matching navigation text like "Shop $50 and under"
-    const isPriceOnlyText = text.length < 20 && text.replace(/[\$\s\d.,]/g, '').length === 0;
+    const isPriceOnlyText = text.length < 30 && text.replace(/[\$€£¥₱฿₫₩Rp\s\d.,]/g, '').length <= 2;
     const hasPriceInClass = el.className.toLowerCase().includes('price') || hasStrongPriceIndicator;
 
     if (match && (hasPriceInClass || isPriceOnlyText)) {
-      const price = parseFloat(match[1].replace(',', ''));
-      if (price < 1 || price > 10000) continue;
-      
+      // Use multi-currency parsing
+      const numericPrice = parseInternationalPrice(text, matchedCurrency);
+      if (numericPrice === 0) continue; // Skip invalid prices
+
       // Get bounding rect from first visible child if parent is hidden
       let rect = el.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) {
@@ -474,7 +720,7 @@ function findPrice(productArea) {
           if (childRect.width > 0) rect = childRect;
         }
       }
-      
+
       // Get font size from deepest text-containing element
       let fontSize = parseFloat(window.getComputedStyle(el).fontSize);
       const textElement = el.querySelector('[class*="price-text"], span:last-child, div:last-child');
@@ -482,43 +728,48 @@ function findPrice(productArea) {
         const childFontSize = parseFloat(window.getComputedStyle(textElement).fontSize);
         if (childFontSize > fontSize) fontSize = childFontSize;
       }
-      
+
       const classList = el.className.toLowerCase();
       const hasPrice = classList.includes('price');
-      
+
       // ENHANCEMENT: Bonus points for data-testid="product-price"
       const hasTestId = hasStrongPriceIndicator ? 25 : 0;
-      
-      const score = 
+
+      const score =
         (fontSize / 10) * 30 +
         (rect.top < 500 ? 30 : 10) +
         (hasPrice ? 20 : 0) +
         hasTestId;
-      
+
       candidates.push({
-        price: match[0],
-        numericPrice: price,
+        price: match[0].trim(),
+        numericPrice: numericPrice,
+        currency: matchedCurrency,
+        currencySymbol: CURRENCY_CONFIG[matchedCurrency].symbol,
         element: el,
         score,
         top: rect.top
       });
     }
   }
-  
+
   if (candidates.length > 0) {
     candidates.sort((a, b) => b.score - a.score);
     const best = candidates[0];
-    
-    console.log(`   ✅ Found price: ${best.price} (confidence: ${Math.min(best.score, 100).toFixed(0)}%)`);
-    
+
+    console.log(`   ✅ Found price: ${best.price} ${best.currency} (confidence: ${Math.min(best.score, 100).toFixed(0)}%)`);
+
     return {
       currentPrice: best.price,
+      numericPrice: best.numericPrice,
+      currency: best.currency,
+      currencySymbol: best.currencySymbol,
       element: best.element,
       confidence: Math.min(best.score / 100, 1),
       method: 'focused-semantic'
     };
   }
-  
+
   console.log('   ❌ Could not find price');
   return { currentPrice: 'Price not found' };
 }
@@ -859,12 +1110,16 @@ async function detectProductInfo() {
   console.log('🪞 ===== DETECTION COMPLETE =====');
   console.log('   Name:', name);
   console.log('   Price:', priceInfo.currentPrice);
+  console.log('   Currency:', priceInfo.currency || 'USD');
   console.log('   Images:', images.length);
   console.log('   Sale:', saleInfo ? 'Yes' : 'No');
-  
+
   return {
     name,
     price: priceInfo.currentPrice,
+    numericPrice: priceInfo.numericPrice,
+    currency: priceInfo.currency || 'USD',
+    currencySymbol: priceInfo.currencySymbol || '$',
     images,
     saleInfo,
     confidence: priceInfo.confidence || 0.7,
@@ -937,27 +1192,31 @@ async function saveProduct() {
     }
     
     if (button) button.textContent = '⏳ Saving...';
-    
+
     const url = window.location.href;
     const store = extractBrand(window.location.hostname);
     const timestamp = new Date().toISOString();
-    
+
     const priceEntry = {
       price: productInfo.price,
       timestamp,
-      numericPrice: parsePrice(productInfo.price),
+      numericPrice: productInfo.numericPrice || parsePrice(productInfo.price),
+      currency: productInfo.currency,
+      currencySymbol: productInfo.currencySymbol,
       isSale: productInfo.saleInfo?.isSale || false,
       confidence: productInfo.confidence,
       method: productInfo.method
     };
-    
+
     if (productInfo.saleInfo) {
       priceEntry.saleReasons = productInfo.saleInfo.reasons;
     }
-    
+
     const product = {
       name: productInfo.name,
       price: productInfo.price,
+      currency: productInfo.currency,
+      currencySymbol: productInfo.currencySymbol,
       image: productInfo.images[0] || '',
       images: productInfo.images,
       url,
@@ -985,12 +1244,14 @@ async function saveProduct() {
         products[existingIndex] = {
           ...existing,
           price: product.price,
+          currency: product.currency,
+          currencySymbol: product.currencySymbol,
           updatedAt: timestamp,
           priceHistory: [...(existing.priceHistory || []), priceEntry],
           detectionMethod: product.detectionMethod,
           detectionConfidence: product.detectionConfidence
         };
-        
+
         if (button) button.textContent = '📈 Updated!';
       } else {
         products.push(product);
