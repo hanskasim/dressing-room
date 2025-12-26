@@ -1033,7 +1033,7 @@ function renderProducts() {
       totalPriceDiv.textContent = `Total: ${data.symbol}${data.total.toFixed(2)}`;
     }
   } else {
-    // Multiple currencies: show breakdown
+    // Multiple currencies: show breakdown with line breaks
     const totalParts = currencies.map(currency => {
       const data = currencyTotals[currency];
       const config = CURRENCY_CONFIG[currency] || CURRENCY_CONFIG.USD;
@@ -1048,7 +1048,8 @@ function renderProducts() {
       return `${currency}: ${data.count} • ${formattedTotal}`;
     });
 
-    totalPriceDiv.textContent = totalParts.join(' | ');
+    // Use innerHTML to support line breaks
+    totalPriceDiv.innerHTML = totalParts.join('<br>');
   }
 
   clearAllBtn.style.display = totalItems > 0 ? 'block' : 'none';
