@@ -11,6 +11,156 @@ console.log('🪞 DRESSING ROOM v3.1: Enhanced detection loaded!');
 let saveButtonEnabled = false;
 
 // ============================================
+// MULTI-CURRENCY CONFIGURATION (v2.1)
+// ============================================
+
+const CURRENCY_CONFIG = {
+  USD: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*USD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 10000
+  },
+  EUR: {
+    patterns: [
+      /€\s*(\d{1,3}(?:[.,]\d{3})*(?:,\d{2})?)/,
+      /(\d{1,3}(?:[.,]\d{3})*(?:,\d{2})?)\s*€/,
+      /(\d{1,3}(?:[.,]\d{3})*(?:,\d{2})?)\s*EUR/
+    ],
+    symbol: '€',
+    decimalSep: ',',
+    thousandsSep: '.',
+    maxPrice: 10000
+  },
+  GBP: {
+    patterns: [
+      /£\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*GBP/
+    ],
+    symbol: '£',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 10000
+  },
+  JPY: {
+    patterns: [
+      /¥\s*(\d{1,3}(?:,\d{3})*)/,
+      /(\d{1,3}(?:,\d{3})*)\s*円/
+    ],
+    symbol: '¥',
+    decimalSep: null,
+    thousandsSep: ',',
+    maxPrice: 1000000
+  },
+  IDR: {
+    patterns: [
+      /Rp\s*(\d{1,3}(?:\.\d{3})*)/,
+      /(\d{1,3}(?:\.\d{3})*)\s*Rp/
+    ],
+    symbol: 'Rp',
+    decimalSep: null,
+    thousandsSep: '.',
+    maxPrice: 10000000
+  },
+  PHP: {
+    patterns: [
+      /₱\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /PHP\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/
+    ],
+    symbol: '₱',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 500000
+  },
+  THB: {
+    patterns: [
+      /฿\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*THB/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*บาท/
+    ],
+    symbol: '฿',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 300000
+  },
+  VND: {
+    patterns: [
+      /₫\s*(\d{1,3}(?:\.\d{3})*)/,
+      /(\d{1,3}(?:\.\d{3})*)\s*₫/,
+      /(\d{1,3}(?:\.\d{3})*)\s*VND/
+    ],
+    symbol: '₫',
+    decimalSep: null,
+    thousandsSep: '.',
+    maxPrice: 100000000
+  },
+  SEK: {
+    patterns: [
+      /(\d{1,3}(?:\s\d{3})*)\s*kr/i,
+      /(\d{1,3}(?:\s\d{3})*)\s*SEK/i
+    ],
+    symbol: 'kr',
+    decimalSep: ',',
+    thousandsSep: ' ',
+    maxPrice: 100000
+  },
+  CNY: {
+    patterns: [
+      /¥\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*元/
+    ],
+    symbol: '¥',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 70000
+  },
+  KRW: {
+    patterns: [
+      /₩\s*(\d{1,3}(?:,\d{3})*)/,
+      /(\d{1,3}(?:,\d{3})*)\s*원/
+    ],
+    symbol: '₩',
+    decimalSep: null,
+    thousandsSep: ',',
+    maxPrice: 10000000
+  },
+  MXN: {
+    patterns: [
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*MXN/,
+      /MXN\s*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 200000
+  },
+  CAD: {
+    patterns: [
+      /CAD\s*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*CAD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 15000
+  },
+  AUD: {
+    patterns: [
+      /AUD\s*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,
+      /\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*AUD/
+    ],
+    symbol: '$',
+    decimalSep: '.',
+    thousandsSep: ',',
+    maxPrice: 15000
+  }
+};
+
+// ============================================
 // UTILITY FUNCTIONS
 // ============================================
 
@@ -39,11 +189,91 @@ function extractBrand(hostname) {
 function formatStructuredPrice(price, currency = 'USD') {
   const numPrice = parseFloat(price);
   if (isNaN(numPrice)) return price.toString();
-  
+
   const symbols = { USD: '$', EUR: '€', GBP: '£', JPY: '¥' };
   const symbol = symbols[currency] || '$';
-  
+
   return `${symbol}${numPrice.toFixed(2)}`;
+}
+
+// ============================================
+// CURRENCY DETECTION & PARSING (v2.1)
+// ============================================
+
+function detectCurrency(priceString, url) {
+  console.log('   🔍 Detecting currency from:', priceString);
+
+  // Strategy 1: Try to match price pattern directly
+  for (const [code, config] of Object.entries(CURRENCY_CONFIG)) {
+    for (const pattern of config.patterns) {
+      if (pattern.test(priceString)) {
+        console.log(`   ✅ Matched ${code} via pattern`);
+        return code;
+      }
+    }
+  }
+
+  // Strategy 2: Fallback to URL-based detection for ambiguous symbols ($)
+  console.log('   ⚠️ No pattern match, checking URL...');
+  const urlLower = url.toLowerCase();
+
+  const URL_CURRENCY_MAP = {
+    '/id/': 'IDR', '/ph/': 'PHP', '/th/': 'THB', '/vn/': 'VND',
+    '/jp/': 'JPY', '/cn/': 'CNY', '/kr/': 'KRW', '/mx/': 'MXN',
+    '/ca/': 'CAD', '/au/': 'AUD', '/uk/': 'GBP', '/gb/': 'GBP',
+    '/eu/': 'EUR', '/de/': 'EUR', '/fr/': 'EUR', '/es/': 'EUR',
+    '/it/': 'EUR', '/se/': 'SEK'
+  };
+
+  for (const [urlPart, currency] of Object.entries(URL_CURRENCY_MAP)) {
+    if (urlLower.includes(urlPart)) {
+      console.log(`   ✅ Detected ${currency} from URL`);
+      return currency;
+    }
+  }
+
+  console.log('   ℹ️ Defaulting to USD');
+  return 'USD';
+}
+
+function parseInternationalPrice(priceString, currency) {
+  const config = CURRENCY_CONFIG[currency];
+  if (!config) return 0;
+
+  // Extract numeric part (remove currency symbols and letters)
+  let numericString = priceString
+    .replace(/[A-Za-z₱฿₫₩¥£€\$Rp]/g, '')
+    .trim();
+
+  // Handle different separator formats based on currency
+  if (config.thousandsSep === '.') {
+    // Indonesian/German format: 299.000,50
+    // Remove dots (thousands), replace comma with dot (decimal)
+    numericString = numericString.replace(/\./g, '').replace(',', '.');
+  } else if (config.thousandsSep === ',') {
+    // US/UK format: 299,000.50
+    // Remove commas (thousands), keep dot (decimal)
+    numericString = numericString.replace(/,/g, '');
+  } else if (config.thousandsSep === ' ') {
+    // Swedish format: 299 000,50
+    // Remove spaces (thousands), replace comma with dot (decimal)
+    numericString = numericString.replace(/\s/g, '').replace(',', '.');
+  }
+
+  const numericPrice = parseFloat(numericString);
+
+  if (isNaN(numericPrice) || numericPrice < 1) {
+    console.log(`   ⚠️ Invalid price after parsing: ${numericString}`);
+    return 0;
+  }
+
+  if (numericPrice > config.maxPrice) {
+    console.log(`   ⚠️ Price ${numericPrice} exceeds max for ${currency} (${config.maxPrice})`);
+    return 0;
+  }
+
+  console.log(`   ✅ Parsed ${priceString} → ${numericPrice} (${currency})`);
+  return numericPrice;
 }
 
 // ============================================
