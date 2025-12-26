@@ -16,11 +16,13 @@ v2.1 🚧 IN PROGRESS (Current Branch: feature/multi-currency)
   └─ Multi-currency support (15+ currencies)
   └─ Currency-grouped totals
   └─ International price detection
+  └─ Known limitation: Product names optimized for English sites
 
 v3.0 📅 PLANNED
   └─ Optional USD conversion
   └─ Currency exchange API integration
   └─ "Show in USD" toggle
+  └─ International product name detection (multi-language keyword support)
 
 v3.1 📅 PLANNED
   └─ Travel mode
@@ -35,10 +37,10 @@ v4.0 💡 FUTURE
 
 ---
 
-## v3.0: Currency Conversion (Q1 2026)
+## v3.0: Currency Conversion + International Enhancement (Q1 2026)
 
 ### Overview
-Enable users to view prices in USD equivalent alongside original currency.
+Enable users to view prices in USD equivalent alongside original currency, plus improve product name detection for non-English websites.
 
 ### Features
 
@@ -118,6 +120,83 @@ function convertToUSD(amount, fromCurrency, rates) {
 - Conversion accuracy within 1% of actual rates
 - Works offline with cached rates (up to 24h old)
 - No performance impact when disabled
+
+---
+
+#### 4. International Product Name Detection
+
+**Current Limitation (v2.1):**
+Product name detection uses English keywords to ensure accuracy on English-language websites. This works perfectly for US/UK/AU sites but causes incomplete names on non-English sites.
+
+**Example:**
+- **English site (US Uniqlo):** ✅ "AIRism Men's Short Sleeve Shirt" (complete)
+- **Non-English site (Indonesian Uniqlo):** ⚠️ "AIRism" (incomplete - missing "Kemeja Lengan Pendek Pria")
+
+**Why This Happens:**
+```javascript
+// v2.1 code uses English keywords to validate subtitles
+if (text.match(/\b(men's|women's|shirt|jacket|pants|...)\b/i)) {
+  return text;  // Only accepts if English keywords found
+}
+```
+
+**Trade-off Explanation:**
+- ✅ **Pro:** Prevents false positives on English sites (grabbing badges, promotions, etc.)
+- ⚠️ **Con:** Misses non-English descriptive text on international sites
+- ✅ **Critical feature still works:** Price detection is 100% accurate across all languages
+
+**User Story for v3.0:**
+As a user shopping on non-English websites, I want complete product names in the local language so I can properly identify items in my collection.
+
+**Implementation Plan:**
+1. **Multi-language keyword dictionary:**
+```javascript
+const KEYWORDS_BY_LANGUAGE = {
+  en: ['men\'s', 'women\'s', 'shirt', 'jacket', 'pants', ...],
+  id: ['pria', 'wanita', 'kemeja', 'jaket', 'celana', ...],  // Indonesian
+  ja: ['メンズ', 'レディース', 'シャツ', 'ジャケット', ...],    // Japanese
+  zh: ['男士', '女士', '衬衫', '夹克', ...],                    // Chinese
+  th: ['ผู้ชาย', 'ผู้หญิง', 'เสื้อ', 'แจ็คเก็ต', ...],      // Thai
+  // ... more languages
+};
+```
+
+2. **Language detection:**
+   - Detect from HTML `<html lang="id-ID">` attribute
+   - Fallback to URL domain (.co.id, .co.jp, etc.)
+   - Fallback to currency detected (IDR → Indonesian)
+
+3. **Smart subtitle validation:**
+```javascript
+function findProductSubtitle(element, language = 'en') {
+  const keywords = KEYWORDS_BY_LANGUAGE[language] || KEYWORDS_BY_LANGUAGE.en;
+  const keywordPattern = new RegExp(`\\b(${keywords.join('|')})\\b`, 'i');
+
+  // Check if subtitle contains relevant keywords in detected language
+  if (text.match(keywordPattern)) {
+    return text;
+  }
+}
+```
+
+4. **Fallback strategy:**
+   - If no keywords match, accept subtitle if it's within length range (10-100 chars)
+   - Cross-reference with structured data (if available)
+   - Display confidence level to user
+
+**Technical Challenges:**
+- **Maintenance burden:** Need to maintain keywords for 15+ languages
+- **False positives:** Non-English sites might also have promotional text
+- **Character encoding:** Ensure proper handling of UTF-8 characters
+- **Testing:** Need native speakers to validate keyword accuracy
+
+**Success Metrics:**
+- Complete product names on non-English sites (>90% accuracy)
+- No regression on English sites (maintain 95%+ accuracy)
+- Supports Indonesian, Japanese, Chinese, Thai, Korean, Vietnamese
+- User can manually edit product name if detection fails
+
+**Priority:** High (directly impacts user experience on international sites)
 
 ---
 

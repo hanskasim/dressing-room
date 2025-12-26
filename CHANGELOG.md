@@ -11,14 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Multi-currency support (15+ currencies including IDR, JPY, PHP, THB, VND, SEK, NOK, DKK, CNY, KRW, MXN, CAD, AUD)
-- Currency-grouped totals display
+- Currency-grouped totals display (multi-line display for better readability)
 - Smart international number parsing (handles different decimal/thousands separators)
 - Currency detection from both price patterns and URL
 - Currency-specific price limits (e.g., ¥50,000 valid for JPY)
+- Data migration for existing products (defaults to USD)
 
 ### Changed
 - Price detection now searches all span/div elements (not just those with "price" class)
 - Price limits are now currency-aware instead of fixed at $10,000
+- Multi-currency totals now display on separate lines instead of comma-separated
+
+### Known Limitations
+- **Product name detection optimized for English sites:** Product names on non-English websites (e.g., Indonesian, Japanese) may be incomplete. This is because the name detection uses English keywords to prevent false positives on English sites. Price detection works perfectly across all languages. Full multi-language support planned for v3.0.
 
 ---
 
