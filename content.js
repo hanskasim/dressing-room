@@ -161,6 +161,59 @@ const CURRENCY_CONFIG = {
 };
 
 // ============================================
+// MULTI-LANGUAGE PRODUCT KEYWORDS (v2.2)
+// ============================================
+
+const PRODUCT_KEYWORDS = {
+  en: {
+    genders: ['men\'s', 'women\'s', 'unisex', 'kids', 'boy\'s', 'girl\'s'],
+    categories: ['shirt', 'jacket', 'pants', 'dress', 'sweater', 'hoodie', 'coat',
+                 'jeans', 'shorts', 'skirt', 'top', 'tee', 'blazer', 'vest', 't-shirt',
+                 'blouse', 'cardigan', 'pullover', 'leggings', 'joggers'],
+    modifiers: ['half-zip', 'full-zip', 'pullover', 'cardigan', 'long-sleeve',
+                'short-sleeve', 'crew-neck', 'v-neck', 'winterized', 'slim-fit',
+                'regular-fit', 'relaxed-fit', 'oversized'],
+    labels: ['size:', 'color:', 'quantity:', 'colour:']
+  },
+  id: {  // Indonesian
+    genders: ['pria', 'wanita', 'unisex', 'anak', 'anak laki-laki', 'anak perempuan'],
+    categories: ['kemeja', 'jaket', 'celana', 'gaun', 'sweater', 'hoodie', 'mantel',
+                 'jeans', 'celana pendek', 'rok', 'atasan', 'kaos', 't-shirt', 'blus'],
+    modifiers: ['lengan panjang', 'lengan pendek', 'kerah bulat', 'kerah v', 'waffle',
+                'setengah ritsleting', 'ritsleting penuh', 'slim fit', 'regular fit'],
+    labels: ['ukuran:', 'warna:', 'jumlah:']
+  },
+  ja: {  // Japanese
+    genders: ['メンズ', 'レディース', 'ユニセックス', 'キッズ', '男性', '女性'],
+    categories: ['シャツ', 'ジャケット', 'パンツ', 'ドレス', 'セーター', 'フーディ', 'コート',
+                 'ジーンズ', 'ショーツ', 'スカート', 'トップス', 'tシャツ', 'ブラウス'],
+    modifiers: ['長袖', '半袖', 'クルーネック', 'vネック', 'スリムフィット', 'レギュラーフィット'],
+    labels: ['サイズ:', 'カラー:', '数量:', '色:']
+  },
+  zh: {  // Chinese (Simplified)
+    genders: ['男士', '女士', '中性', '儿童', '男孩', '女孩'],
+    categories: ['衬衫', '夹克', '裤子', '连衣裙', '毛衣', '卫衣', '外套',
+                 '牛仔裤', '短裤', '裙子', '上衣', 't恤', '女衬衫'],
+    modifiers: ['长袖', '短袖', '圆领', 'v领', '修身', '常规', '宽松'],
+    labels: ['尺寸:', '颜色:', '数量:']
+  },
+  th: {  // Thai
+    genders: ['ผู้ชาย', 'ผู้หญิง', 'ยูนิเซ็กซ์', 'เด็ก'],
+    categories: ['เสื้อเชิ้ต', 'แจ็คเก็ต', 'กางเกง', 'เดรส', 'เสวตเตอร์', 'ฮู้ด', 'เสื้อโค้ท',
+                 'ยีนส์', 'กางเกงขาสั้น', 'กระโปรง', 'เสื้อ', 'ทีเชิร์ต'],
+    modifiers: ['แขนยาว', 'แขนสั้น', 'คอกลม', 'คอวี'],
+    labels: ['ขนาด:', 'สี:', 'จำนวน:']
+  },
+  ko: {  // Korean
+    genders: ['남성', '여성', '유니섹스', '키즈', '남아', '여아'],
+    categories: ['셔츠', '재킷', '바지', '드레스', '스웨터', '후디', '코트',
+                 '청바지', '반바지', '스커트', '상의', '티셔츠', '블라우스'],
+    modifiers: ['긴팔', '반팔', '라운드넥', '브이넥', '슬림핏', '레귤러핏'],
+    labels: ['사이즈:', '색상:', '수량:']
+  }
+};
+
+// ============================================
 // UTILITY FUNCTIONS
 // ============================================
 
@@ -274,6 +327,47 @@ function parseInternationalPrice(priceString, currency) {
 
   console.log(`   ✅ Parsed ${priceString} → ${numericPrice} (${currency})`);
   return numericPrice;
+}
+
+// ============================================
+// LANGUAGE DETECTION (v2.2)
+// ============================================
+
+function detectLanguage(url) {
+  console.log('   🌐 Detecting page language...');
+
+  // Strategy 1: Check HTML lang attribute
+  const htmlLang = document.documentElement.lang;
+  if (htmlLang) {
+    const langCode = htmlLang.toLowerCase().split('-')[0];
+    if (PRODUCT_KEYWORDS[langCode]) {
+      console.log(`   ✅ Detected language "${langCode}" from HTML lang attribute`);
+      return langCode;
+    }
+  }
+
+  // Strategy 2: URL-based detection
+  const urlLower = url.toLowerCase();
+
+  const URL_LANGUAGE_MAP = {
+    '/id/': 'id', '.co.id': 'id', '/id-id/': 'id',
+    '/jp/': 'ja', '.co.jp': 'ja', '/ja/': 'ja', '/ja-jp/': 'ja',
+    '/cn/': 'zh', '.cn': 'zh', '/zh/': 'zh', '/zh-cn/': 'zh',
+    '/th/': 'th', '.co.th': 'th', '/th-th/': 'th',
+    '/kr/': 'ko', '.co.kr': 'ko', '/ko/': 'ko', '/ko-kr/': 'ko',
+    '/en/': 'en', '/us/': 'en', '/uk/': 'en', '/en-us/': 'en', '/en-gb/': 'en'
+  };
+
+  for (const [urlPart, lang] of Object.entries(URL_LANGUAGE_MAP)) {
+    if (urlLower.includes(urlPart)) {
+      console.log(`   ✅ Detected language "${lang}" from URL`);
+      return lang;
+    }
+  }
+
+  // Strategy 3: Default to English
+  console.log('   ℹ️ Defaulting to English');
+  return 'en';
 }
 
 // ============================================
@@ -501,7 +595,7 @@ function detectStructuredData() {
 // PRIORITY 2: FOCUSED SEMANTIC DETECTION (ENHANCED)
 // ============================================
 
-function findProductSubtitle(titleElement) {
+function findProductSubtitle(titleElement, language = 'en') {
   const possibleSubtitles = [
     titleElement.nextElementSibling,
     titleElement.nextElementSibling?.nextElementSibling,
@@ -510,56 +604,123 @@ function findProductSubtitle(titleElement) {
     titleElement.parentElement?.querySelector('p'),
     titleElement.parentElement?.querySelector('h2')
   ];
-  
+
+  // Get keywords for detected language
+  const keywords = PRODUCT_KEYWORDS[language] || PRODUCT_KEYWORDS.en;
+  const allKeywords = [
+    ...keywords.genders,
+    ...keywords.categories,
+    ...keywords.modifiers
+  ];
+
+  // Create pattern for keyword matching (case-insensitive)
+  const keywordPattern = new RegExp(`\\b(${allKeywords.join('|')})\\b`, 'i');
+
+  // Get label prefixes for detected language (for exclusion)
+  const labelPrefixes = keywords.labels;
+
   for (const el of possibleSubtitles) {
     if (!el) continue;
     if (el.offsetWidth === 0 || el.offsetHeight === 0) continue;
-    
+
     const text = el.textContent.trim();
-    
+
     if (text.length < 5 || text.length > 100) continue;
     if (text.includes('$') || text.match(/\d+\.\d{2}/)) continue;
-    
+
     const lowerText = text.toLowerCase();
-    if (lowerText.includes('add to') || 
+
+    // Exclude common UI labels (Size:, Color:, Quantity:, etc.)
+    const startsWithLabel = labelPrefixes.some(prefix => lowerText.startsWith(prefix));
+    if (startsWithLabel) {
+      console.log('   ⏭️ Skipping label:', text);
+      continue;
+    }
+
+    // Exclude action buttons
+    if (lowerText.includes('add to') ||
         lowerText.includes('buy now') ||
         lowerText.includes('select') ||
         lowerText.includes('choose')) {
       continue;
     }
-    
-    if (text.match(/\b(men's|women's|unisex|kids|shirt|jacket|pants|dress|sweater|hoodie|coat|jeans|shorts|half-zip|full-zip|pullover|cardigan|vest|blazer|skirt|top|tee|winterized)\b/i)) {
-      console.log('   ✅ Found subtitle:', text);
+
+    // Check if text contains relevant keywords in detected language
+    if (keywordPattern.test(text)) {
+      console.log(`   ✅ Found subtitle (${language}):`, text);
       return text;
     }
   }
-  
+
   return null;
+}
+
+// Helper function to check if element is in navigation/header (v2.2 fix)
+function isInNavigationOrHeader(element) {
+  // Check if element or any parent is a nav/header
+  let current = element;
+  while (current && current !== document.body) {
+    const tagName = current.tagName?.toLowerCase();
+    const className = current.className?.toLowerCase() || '';
+    const role = current.getAttribute('role')?.toLowerCase() || '';
+
+    // Check for navigation/header elements
+    if (tagName === 'nav' || tagName === 'header') {
+      return true;
+    }
+
+    // Check for navigation/header classes
+    if (className.includes('nav') ||
+        className.includes('header') ||
+        className.includes('menu') ||
+        className.includes('top-bar') ||
+        className.includes('toolbar')) {
+      return true;
+    }
+
+    // Check for navigation roles
+    if (role === 'navigation' || role === 'banner') {
+      return true;
+    }
+
+    current = current.parentElement;
+  }
+
+  return false;
 }
 
 function findProductName(productArea) {
   console.log('🔍 Finding product name...');
-  
+
   const candidates = [];
   const searchArea = productArea || document.body;
-  
+
+  // Detect language for multi-language keyword support (v2.2)
+  const language = detectLanguage(window.location.href);
+
   // Look for h1 first (most common)
   const h1Elements = searchArea.querySelectorAll('h1');
   for (const h1 of h1Elements) {
     if (h1.offsetWidth === 0 || h1.offsetHeight === 0) continue;
-    
+
+    // Skip if in navigation/header (v2.2 fix)
+    if (isInNavigationOrHeader(h1)) {
+      console.log('   ⏭️ Skipping h1 in navigation/header:', h1.textContent.trim());
+      continue;
+    }
+
     const text = h1.textContent.trim();
-    if (isValidProductName(text)) {
+    if (isValidProductName(text, language)) {
       // Check if this is a short brand/collection name that needs a subtitle
       if (text.length < 25 && !text.match(/\b(shirt|jacket|pants|dress|sweater|hoodie|coat|jeans)\b/i)) {
-        const subtitle = findProductSubtitle(h1);
+        const subtitle = findProductSubtitle(h1, language);
         if (subtitle) {
           const fullName = `${text} ${subtitle}`;
           console.log('   ✅ Found in h1 + subtitle:', fullName);
           return fullName;
         }
       }
-      
+
       console.log('   ✅ Found in h1:', text);
       return text;
     }
@@ -571,8 +732,14 @@ function findProductName(productArea) {
   for (const el of testIdElements) {
     if (el.offsetWidth === 0 || el.offsetHeight === 0) continue;
 
+    // Skip if in navigation/header (v2.2 fix - critical for non-English sites)
+    if (isInNavigationOrHeader(el)) {
+      console.log('   ⏭️ Skipping element in navigation/header:', el.textContent.trim());
+      continue;
+    }
+
     const text = el.textContent.trim();
-    if (isValidProductName(text)) {
+    if (isValidProductName(text, language)) {
       const fontSize = parseFloat(window.getComputedStyle(el).fontSize);
       const rect = el.getBoundingClientRect();
 
@@ -594,9 +761,15 @@ function findProductName(productArea) {
   const titleElements = searchArea.querySelectorAll('[class*="product-title"], [class*="product-name"], [class*="ProductTitle"], [class*="ProductName"]');
   for (const el of titleElements) {
     if (el.offsetWidth === 0 || el.offsetHeight === 0) continue;
-    
+
+    // Skip if in navigation/header (v2.2 fix)
+    if (isInNavigationOrHeader(el)) {
+      console.log('   ⏭️ Skipping title element in navigation/header:', el.textContent.trim());
+      continue;
+    }
+
     const text = el.textContent.trim();
-    if (isValidProductName(text)) {
+    if (isValidProductName(text, language)) {
       const fontSize = parseFloat(window.getComputedStyle(el).fontSize);
       const rect = el.getBoundingClientRect();
       
@@ -620,24 +793,54 @@ function findProductName(productArea) {
   return 'Product Name Not Found';
 }
 
-function isValidProductName(text) {
+function isValidProductName(text, language = 'en') {
   if (!text) return false;
-  
+
   if (text.length < 3 || text.length > 150) return false;
   if (text.includes('$') || text.match(/\d+\.\d{2}/)) return false;
-  
-  const excludeWords = ['menu', 'home', 'shop', 'cart', 'checkout', 'search', 'account', 'sign in', 'log in'];
+
+  // Reject numeric-only text (ratings, counts, etc.) - v2.2 fix for "4.5" detection
+  if (text.match(/^\d+(\.\d+)?$/)) {
+    console.log('   ⏭️ Skipping numeric value (likely rating):', text);
+    return false;
+  }
+
+  // Exclude common navigation/menu words (v2.2 - multi-language)
+  const excludeWords = {
+    en: ['menu', 'home', 'shop', 'cart', 'checkout', 'search', 'account', 'sign in', 'log in', 'women', 'men', 'kids', 'baby'],
+    id: ['menu', 'beranda', 'belanja', 'keranjang', 'akun', 'masuk', 'wanita', 'pria', 'anak'],
+    ja: ['メニュー', 'ホーム', 'ショップ', 'カート', 'アカウント', 'ログイン', 'レディース', 'メンズ', 'キッズ'],
+    zh: ['菜单', '首页', '商店', '购物车', '账户', '登录', '女士', '男士', '儿童'],
+    th: ['เมนู', 'หน้าแรก', 'ร้านค้า', 'ตะกร้า', 'บัญชี', 'เข้าสู่ระบบ', 'ผู้หญิง', 'ผู้ชาย', 'เด็ก'],
+    ko: ['메뉴', '홈', '쇼핑', '장바구니', '계정', '로그인', '여성', '남성', '키즈']
+  };
+
   const lowerText = text.toLowerCase();
-  if (excludeWords.includes(lowerText)) return false;
-  
+  const currentLanguageExcludes = excludeWords[language] || excludeWords.en;
+
+  if (currentLanguageExcludes.some(word => lowerText === word)) {
+    console.log(`   ⏭️ Skipping navigation word (${language}):`, text);
+    return false;
+  }
+
   if (text.match(/^\w+\s*\/\s*\w+/) || text.includes(' > ')) return false;
-  
+
   // Exclude badge/label patterns
   if (text.length < 20 && text === text.toUpperCase() && !text.match(/\d/)) {
     console.log('   ⏭️ Skipping badge (all caps):', text);
     return false;
   }
-  
+
+  // Multi-language label exclusion (v2.2)
+  const keywords = PRODUCT_KEYWORDS[language] || PRODUCT_KEYWORDS.en;
+  const labelPrefixes = keywords.labels;
+  const startsWithLabel = labelPrefixes.some(prefix => lowerText.startsWith(prefix));
+  if (startsWithLabel) {
+    console.log(`   ⏭️ Skipping label (${language}):`, text);
+    return false;
+  }
+
+  // Fallback: generic colon-based label detection
   if (text.match(/^[A-Z][a-z]+:/)) {
     console.log('   ⏭️ Skipping label (has colon):', text);
     return false;

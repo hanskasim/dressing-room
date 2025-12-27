@@ -10,6 +10,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Multi-language product name detection (Indonesian, Japanese, Chinese, Thai, Korean)
+- Language-specific keyword dictionaries for accurate product name identification
+- Automatic language detection from URL and HTML attributes
+- Label exclusion logic (Size:, Color:, Quantity: in multiple languages)
+- Navigation/header filtering to prevent menu text from being detected as product names
+
+### Fixed
+- Product name detection on Indonesian websites (e.g., Indonesian Uniqlo)
+- Incorrect detection of size/color labels as product names (e.g., "Ukuran: Wanita M")
+- Incomplete product names on non-English sites
+- Navigation menu items (e.g., "WOMEN", "Wanita") being detected as product names
+- Review ratings (e.g., "4.5") being detected as product names on Japanese sites
+
+---
+
+## [2.1.0] - 2025-01-XX
+
+### Added
 - Multi-currency support (15+ currencies including IDR, JPY, PHP, THB, VND, SEK, NOK, DKK, CNY, KRW, MXN, CAD, AUD)
 - Currency-grouped totals display (multi-line display for better readability)
 - Smart international number parsing (handles different decimal/thousands separators)
@@ -23,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-currency totals now display on separate lines instead of comma-separated
 
 ### Known Limitations
-- **Product name detection optimized for English sites:** Product names on non-English websites (e.g., Indonesian, Japanese) may be incomplete. This is because the name detection uses English keywords to prevent false positives on English sites. Price detection works perfectly across all languages. Full multi-language support planned for v3.0.
+- **Product name detection optimized for English sites:** Product names on non-English websites (e.g., Indonesian, Japanese) may be incomplete. This is because the name detection uses English keywords to prevent false positives on English sites. Price detection works perfectly across all languages. (Fixed in v2.2)
 
 ---
 
@@ -67,8 +85,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History Quick Reference
 
-- **v2.1** (In Progress) - Multi-currency support
-- **v2.0** (Current) - Production release, local-only
+- **v2.2** (In Progress) - Multi-language product name detection
+- **v2.1** (Released) - Multi-currency support
+- **v2.0** (Released) - Production release, local-only
 - **v1.0** (Beta) - Initial prototype
 
 ---
